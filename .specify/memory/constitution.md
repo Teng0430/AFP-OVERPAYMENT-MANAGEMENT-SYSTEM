@@ -2,10 +2,9 @@
   ============================================================================
   SYNC IMPACT REPORT
   ============================================================================
-  Version change: 1.0.0 -> 1.0.1
+  Version change: 1.0.1 -> 1.1.0
   Modified sections:
-    - Technology Stack & Standards (version columns updated from vague "Latest"
-      to specific version numbers)
+    - Technology Stack & Standards (added PHP 8.3, Composer 2.8.x, npm 11.x rows)
   Added sections: None
   Removed sections: None
   Templates requiring updates:
@@ -14,6 +13,8 @@
     - .specify/templates/tasks-template.md (already generic - no changes needed)
     - .specify/templates/checklist-template.md (already generic - no changes needed)
     - .specify/templates/constitution-template.md (already generic - no changes needed)
+  Dependent artifacts updated:
+    - docs/notes.md (added Development Tools section with pinned versions)
   Deferred TODOs: None
   ============================================================================
 -->
@@ -31,7 +32,7 @@ any merge. No dead code, commented-out code, or debug artifacts (dd(), dump(),
 console.log, debugger) shall be committed. Every PR MUST receive at least one
 approving code review before merging.
 
-*Rationale*: Consistent, clean code reduces maintenance burden, accelerates
+_Rationale_: Consistent, clean code reduces maintenance burden, accelerates
 onboarding, and prevents regressions.
 
 ### II. Testing Standards
@@ -42,7 +43,7 @@ tests before being marked complete. Minimum line coverage: 80% for backend, 70% 
 frontend. Contract tests MUST be written for every API endpoint. The full test suite
 MUST pass before every commit and every PR merge.
 
-*Rationale*: Comprehensive testing is the safety net that enables confident
+_Rationale_: Comprehensive testing is the safety net that enables confident
 refactoring and rapid delivery.
 
 ### III. User Experience Consistency
@@ -53,7 +54,7 @@ loading, and empty states. All API responses MUST use a consistent JSON envelope
 (`{ success: bool, data: ..., error: ... }`). The frontend MUST be responsive
 (mobile-first) and meet WCAG 2.1 AA accessibility standards.
 
-*Rationale*: Inconsistent UX erodes user trust, increases support burden, and
+_Rationale_: Inconsistent UX erodes user trust, increases support burden, and
 dilutes brand identity.
 
 ### IV. Performance Requirements
@@ -64,7 +65,7 @@ Frontend initial bundle size MUST be <500KB gzipped. Hot endpoints MUST employ
 caching (Laravel cache facade, Redis, or Octane). Database indexes MUST be present
 on all columns used in WHERE, JOIN, and ORDER BY clauses.
 
-*Rationale*: Performance is a feature — slow applications directly cause user churn
+_Rationale_: Performance is a feature — slow applications directly cause user churn
 and lost revenue.
 
 ### V. Security & Data Integrity
@@ -75,28 +76,32 @@ endpoints MUST validate and sanitize input. Never commit .env files or secrets; 
 tokens MUST be scoped to the minimum necessary. SQL injection, XSS, and CSRF
 protections MUST remain active in all environments.
 
-*Rationale*: Security breaches are existential threats; proactive defense is
+_Rationale_: Security breaches are existential threats; proactive defense is
 non-negotiable.
 
 ## Technology Stack & Standards
 
-| Technology | Version |
-|-----------|---------|
-| Laravel (backend) | 11.x (PHP 8.2+) |
-| React (frontend) | 19.2.x |
-| MySQL (database) | 8.4 LTS |
-| Pest (backend testing, in-memory SQLite) | 4.x |
-| Vitest (frontend testing) | 4.1.x |
-| Laravel Sanctum + bcrypt (auth) | bundled with Laravel 11 |
-| axios (HTTP client) | 1.18.x |
-| jsonwebtoken (JWT) | 9.0.x |
-| react-router-dom (routing) | 7.18.x |
-| Node.js (runtime) | 22.x LTS |
-| Project structure | `apps/` for code, `docs/` for docs |
+| Technology                               | Version                            |
+| ---------------------------------------- | ---------------------------------- |
+| Laravel (backend)                        | 11.x                               |
+| React (frontend)                         | 19.2.x                             |
+| MySQL (database)                         | 8.4 LTS                            |
+| Pest (backend testing, in-memory SQLite) | 4.x                                |
+| Vitest (frontend testing)                | 4.1.x                              |
+| Laravel Sanctum + bcrypt (auth)          | bundled with Laravel 11            |
+| axios (HTTP client)                      | 1.18.x                             |
+| jsonwebtoken (JWT)                       | 9.0.x                              |
+| react-router-dom (routing)               | 7.18.x                             |
+| Node.js (runtime)                        | 22.x LTS                           |
+| PHP (runtime)                            | 8.2+                               |
+| Composer (dependency manager)            | 2.8.x                              |
+| npm (package manager)                    | 11.x                               |
+| Project structure                        | `apps/` for code, `docs/` for docs |
 
 All feature code MUST reside under `apps/`. Documentation and supporting files go
 in `docs/`. Environment configuration follows `.env.example` — never commit `.env`
-or `.env.*` files.
+or `.env.*` files. The working environment MUST have PHP 8.3, Composer 2.8.x,
+Node.js 22.x LTS, and npm 11.x installed for scaffolding and development.
 
 ## Development Workflow & Quality Gates
 
@@ -123,6 +128,7 @@ Complexity violations MUST be documented and justified in the plan.
 
 This constitution supersedes all other development guidelines and practices.
 Amendments require:
+
 - A documented rationale for the change.
 - Team approval before adoption.
 - A migration plan if the amendment is backward-incompatible.
@@ -134,4 +140,4 @@ and approved during code review.
 
 ---
 
-**Version**: 1.0.1 | **Ratified**: 2026-06-27 | **Last Amended**: 2026-06-27
+**Version**: 1.1.0 | **Ratified**: 2026-06-27 | **Last Amended**: 2026-06-27
