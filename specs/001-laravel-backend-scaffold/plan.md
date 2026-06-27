@@ -40,7 +40,7 @@ Initialize a Laravel 11 backend project with MySQL database connection, API rout
 | G-002 | PHPStan level 6 | CONFIGURED | `phpstan/phpstan` required as dev dependency with level=6 in config |
 | G-003 | Pest testing with in-memory SQLite | CONFIGURED | Laravel 11 ships with Pest; `DB_CONNECTION=sqlite` and `DB_DATABASE=:memory:` in phpunit.xml for testing |
 | G-004 | Consistent JSON envelope | CONFIGURED | API response macro/service registered in `AppServiceProvider` or `App\Http\Response` |
-| G-005 | Laravel Sanctum token auth | CONFIGURED | Sanctum installed and configured; `EnsureFrontendRequestsAreStateful` middleware active for SPA auth |
+| G-005 | Laravel Sanctum token auth | CONFIGURED | Sanctum installed and configured in API token mode; SPA cookie auth deferred to future feature |
 | G-006 | Database indexes on WHERE/JOIN/ORDER BY | NOTED | Built-in migrations include indexes on `users.email` and `personal_access_tokens.tokenable_id`; future features must maintain this |
 | G-007 | Code under `apps/` directory | COMPLIANT | Laravel project root is `apps/backend/`; all PHP code lives within that subtree |
 | G-008 | .env.example as reference | CONFIGURED | Default `.env.example` from Laravel extended with all required configuration keys |

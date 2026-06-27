@@ -40,8 +40,9 @@
 - [ ] T006 Complete `.env.example` with all required variables: `DB_CONNECTION`, `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`, `SANCTUM_STATEFUL_DOMAINS`, `SESSION_DRIVER`, `CORS_PATHS`, `CORS_ALLOWED_ORIGINS`
 - [ ] T007 Run default Laravel migrations (`php artisan migrate`) – tables: users, password_reset_tokens, personal_access_tokens, sessions, cache, cache_locks, failed_jobs
 - [ ] T008 [P] Install and configure Laravel Sanctum – publish config, set `api` guard, configure token abilities
-- [ ] T009 [P] Set up base API route structure in `routes/api.php` – load routes with `api` middleware group
-- [ ] T010 Write database connection test in `tests/Feature/DatabaseTest.php` – confirm MySQL connection and expected tables exist
+- [ ] T009 [P] Set up base API route structure in `apps/backend/routes/api.php` – load routes with `api` middleware group
+- [ ] T010 Write database connection test in `tests/Feature/DatabaseTest.php` – confirm MySQL connection and expected tables exist (connectivity validation only — uses real MySQL; all other tests use in-memory SQLite per constitution)
+- [ ] T011 Configure Pest coverage to 80% minimum in `phpunit.xml` with `<coverage><min>80%</min></coverage>`
 
 **Checkpoint**: Foundation ready – user story implementation can now begin.
 
@@ -105,13 +106,12 @@
 
 ### Implementation for User Story 3
 
-- [ ] T027 [US3] Install Laravel Sanctum via `php artisan install:api`
-- [ ] T028 [US3] Create health-check controller at `apps/backend/app/Http/Controllers/Api/HealthCheckController.php`
-- [ ] T029 [US3] Define health-check route in `apps/backend/routes/api.php` at `GET /api/health`
-- [ ] T030 [US3] Register API response envelope macro in `apps/backend/app/Providers/AppServiceProvider.php`
-- [ ] T031 [P] [US3] Configure CORS in `apps/backend/config/cors.php` for frontend origin
-- [ ] T032 [US3] Add `auth:sanctum` middleware to API route group in `apps/backend/routes/api.php`
-- [ ] T033 [US3] Verify health-check endpoint returns database connectivity status
+- [ ] T027 [US3] Create health-check controller at `apps/backend/app/Http/Controllers/Api/HealthCheckController.php`
+- [ ] T028 [US3] Define health-check route in `apps/backend/routes/api.php` at `GET /api/health`
+- [ ] T029 [US3] Register API response envelope macro in `apps/backend/app/Providers/AppServiceProvider.php`
+- [ ] T030 [P] [US3] Configure CORS in `apps/backend/config/cors.php` for frontend origin
+- [ ] T031 [US3] Add `auth:sanctum` middleware to API route group in `apps/backend/routes/api.php`
+- [ ] T032 [US3] Verify health-check endpoint returns database connectivity status
 
 **Checkpoint**: API foundation works - authenticated endpoints protected, health endpoint operational
 
@@ -125,15 +125,14 @@
 
 ### Tests for User Story 4
 
-- [ ] T034 [P] [US4] Write test verifying `.env.example` contains all required keys
-- [ ] T035 [US4] Write test verifying `php artisan config:cache` runs without errors
+- [ ] T033 [P] [US4] Write test verifying `.env.example` contains all required keys
+- [ ] T034 [US4] Write test verifying `php artisan config:cache` runs without errors
 
 ### Implementation for User Story 4
 
-- [ ] T036 [US4] Extend `apps/backend/.env.example` with all required configuration keys
-- [ ] T037 [US4] Run `./vendor/bin/pint` to auto-fix PSR-12 style on all scaffolded files
-- [ ] T038 [US4] Run `vendor/bin/phpstan analyse --level=6` and fix any errors in scaffolded code
-- [ ] T039 [US4] Add `apps/backend/.env` to `.gitignore` and verify `.env.example` is tracked
+- [ ] T035 [US4] Run `./vendor/bin/pint` to auto-fix PSR-12 style on all scaffolded files
+- [ ] T036 [US4] Run `vendor/bin/phpstan analyse --level=6` and fix any errors in scaffolded code
+- [ ] T037 [US4] Add `apps/backend/.env` to `.gitignore` and verify `.env.example` is tracked
 
 **Checkpoint**: Tooling is configured and passes on all scaffolded code
 
@@ -143,14 +142,14 @@
 
 **Purpose**: Full validation of the complete scaffold
 
-- [ ] T040 Run `php artisan test` and confirm full test suite passes (zero failures)
-- [ ] T041 [P] Run `vendor/bin/phpstan analyse --level=6` and confirm zero errors
-- [ ] T042 [P] Run `./vendor/bin/pint --test` and confirm zero style violations
-- [ ] T043 Run `php artisan migrate:fresh` from scratch and verify all tables created
-- [ ] T044 Run `php artisan route:list` and verify expected routes are registered
-- [ ] T045 Execute [quickstart.md](quickstart.md) validation scenarios end-to-end
-- [ ] T046 Verify `apps/backend/.env.example` has no secrets committed
-- [ ] T047 Update `AGENTS.md` to reference the completed feature
+- [ ] T038 Run `php artisan test` and confirm full test suite passes (zero failures)
+- [ ] T039 [P] Run `vendor/bin/phpstan analyse --level=6` and confirm zero errors
+- [ ] T040 [P] Run `./vendor/bin/pint --test` and confirm zero style violations
+- [ ] T041 Run `php artisan migrate:fresh` from scratch and verify all tables created
+- [ ] T042 Run `php artisan route:list` and verify expected routes are registered
+- [ ] T043 Execute [quickstart.md](quickstart.md) validation scenarios end-to-end
+- [ ] T044 Verify `apps/backend/.env.example` has no secrets committed
+- [ ] T045 Update `AGENTS.md` to reference the completed feature
 
 ---
 
@@ -198,7 +197,7 @@ Task: "Write contract test for health-check endpoint at tests/Feature/HealthChec
 Task: "Write contract test for unauthenticated access returning 401 JSON"
 
 # Launch all implementation tasks for User Story 3 together:
-Task: "Install Laravel Sanctum via php artisan install:api"
+Task: "Define health-check route in apps/backend/routes/api.php"
 Task: "Configure CORS in apps/backend/config/cors.php"
 ```
 
