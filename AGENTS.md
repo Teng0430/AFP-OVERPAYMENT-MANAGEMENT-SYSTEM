@@ -1,7 +1,7 @@
 <!-- SPECKIT START -->
 For additional context about technologies to be used, project structure,
 shell commands, and other important information, read the current plan
-at specs/001-laravel-backend-scaffold/plan.md
+at specs/002-react-frontend-scaffold/plan.md
 <!-- SPECKIT END -->
 
 ## Completed Features
@@ -24,3 +24,20 @@ Laravel 12 backend scaffold at `apps/backend/` with:
 **Run tests**: `cd apps/backend && php artisan test`
 **Run server**: `cd apps/backend && php artisan serve`
 **Migrations**: `cd apps/backend && php artisan migrate`
+
+### 002 - React Frontend Scaffold (2026-06-27)
+
+React + Vite frontend scaffold at `apps/frontend/` with:
+- React 19.2.x with TypeScript strict mode
+- Vite build tool (dev server, HMR, optimized production builds)
+- Vitest 4.1.x testing with coverage reporting
+- ESLint flat config + Prettier for code quality
+- react-router-dom 7.x for client-side routing
+- axios 1.18.x HTTP client with centralized API service
+- Environment variable configuration via `.env.example`
+- Bundle size budget <500KB gzipped
+
+**Run dev server**: `cd apps/frontend && npm run dev`
+**Run tests**: `cd apps/frontend && npm test`
+**Build**: `cd apps/frontend && npm run build`
+**Lint**: `cd apps/frontend && npm run lint`
