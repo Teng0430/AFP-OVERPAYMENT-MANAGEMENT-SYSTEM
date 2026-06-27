@@ -8,7 +8,7 @@
 
 **Input**: User description: "Scaffold backend using Laravel 11 and use MySQL as database."
 
-## User Scenarios & Testing *(mandatory)*
+## User Scenarios & Testing _(mandatory)_
 
 ### User Story 1 - Initialize Backend Project (Priority: P1)
 
@@ -76,7 +76,7 @@ As a developer, I want environment configuration and development tooling set up 
 - How does the system handle an existing project in the target directory — overwrite, abort, or prompt?
 - What happens when runtime version requirements are not met — does the project check compatibility before proceeding?
 
-## Requirements *(mandatory)*
+## Requirements _(mandatory)_
 
 ### Functional Requirements
 
@@ -88,13 +88,13 @@ As a developer, I want environment configuration and development tooling set up 
 - **FR-006**: System MUST configure cross-origin request handling to permit frontend communication during development.
 - **FR-007**: System MUST include token-based API authentication that can be applied to any route without additional configuration.
 
-### Key Entities *(include if feature involves data)*
+### Key Entities _(include if feature involves data)_
 
 - **Users**: Core entity representing registered accounts, storing identity information and authentication credentials.
 - **API Tokens**: Authentication tokens issued to clients for secure API access, scoped to the minimum necessary permissions.
 - **Sessions**: Server-side session records for stateful interactions between the application and browser-based clients.
 
-## Success Criteria *(mandatory)*
+## Success Criteria _(mandatory)_
 
 ### Measurable Outcomes
 
@@ -105,8 +105,9 @@ As a developer, I want environment configuration and development tooling set up 
 
 ## Assumptions
 
-- A compatible version of MySQL is already installed and running on the development machine.
-- Required runtime environments (PHP, Composer, Node.js) are installed and accessible via the command line.
-- Standard project conventions and structure are followed for the chosen framework.
-- The project will be created in the designated source code directory per project standards.
-- Built-in authentication scaffolding is available and will be configured for API token-based access.
+- PHP 8.2+ and Composer are available in the development environment.
+- MySQL 8.x server is available (local or remote) and accessible from the development environment.
+- The project already has a frontend or will have one developed separately that consumes the backend API.
+- Authentication mechanisms (registration, login, password reset) will be implemented in a subsequent feature.
+- The backend will serve a JSON API (not a server-rendered HTML application).
+- CI/CD pipeline configuration is out of scope for this scaffold feature.
