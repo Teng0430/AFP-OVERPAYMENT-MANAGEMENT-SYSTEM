@@ -23,10 +23,10 @@
 
 **Purpose**: Scaffold Laravel 11 project in `apps/backend/` and install all required dependencies.
 
-- [ ] T001 Create Laravel 11 project in `apps/backend/` via `composer create-project laravel/laravel`
-- [ ] T002 [P] Install required Composer packages: laravel/sanctum, pestphp/pest, pestphp/pest-plugin-laravel, laravel/pint, phpstan/phpstan, phpstan/phpstan-laravel
-- [ ] T003 Configure `.env` with basic app settings and generate APP_KEY via `php artisan key:generate`
-- [ ] T004 Write smoke test confirming application boots in `tests/Feature/SmokeTest.php`
+- [X] T001 Create Laravel 11 project in `apps/backend/` via `composer create-project laravel/laravel`
+- [X] T002 [P] Install required Composer packages: laravel/sanctum, pestphp/pest, pestphp/pest-plugin-laravel, laravel/pint, phpstan/phpstan, phpstan/phpstan-laravel
+- [X] T003 Configure `.env` with basic app settings and generate APP_KEY via `php artisan key:generate`
+- [X] T004 Write smoke test confirming application boots in `tests/Feature/SmokeTest.php`
 
 ---
 
@@ -36,13 +36,13 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete.
 
-- [ ] T005 Configure MySQL database connection in `config/database.php` – set default to `mysql`, charset `utf8mb4`, collation `utf8mb4_unicode_ci`
-- [ ] T006 Complete `.env.example` with all required variables: `DB_CONNECTION`, `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`, `SANCTUM_STATEFUL_DOMAINS`, `SESSION_DRIVER`, `CORS_PATHS`, `CORS_ALLOWED_ORIGINS`
-- [ ] T007 Run default Laravel migrations (`php artisan migrate`) – tables: users, password_reset_tokens, personal_access_tokens, sessions, cache, cache_locks, failed_jobs
-- [ ] T008 [P] Install and configure Laravel Sanctum – publish config, set `api` guard, configure token abilities
-- [ ] T009 [P] Set up base API route structure in `apps/backend/routes/api.php` – load routes with `api` middleware group
-- [ ] T010 Write database connection test in `tests/Feature/DatabaseTest.php` – confirm MySQL connection and expected tables exist (connectivity validation only — uses real MySQL; all other tests use in-memory SQLite per constitution)
-- [ ] T011 Configure Pest coverage to 80% minimum in `phpunit.xml` with `<coverage><min>80%</min></coverage>`
+- [X] T005 Configure MySQL database connection in `config/database.php` – set default to `mysql`, charset `utf8mb4`, collation `utf8mb4_unicode_ci`
+- [X] T006 Complete `.env.example` with all required variables: `DB_CONNECTION`, `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`, `SANCTUM_STATEFUL_DOMAINS`, `SESSION_DRIVER`, `CORS_PATHS`, `CORS_ALLOWED_ORIGINS`
+- [X] T007 Run default Laravel migrations (`php artisan migrate`) – tables: users, password_reset_tokens, personal_access_tokens, sessions, cache, cache_locks, failed_jobs
+- [X] T008 [P] Install and configure Laravel Sanctum – publish config, set `api` guard, configure token abilities
+- [X] T009 [P] Set up base API route structure in `apps/backend/routes/api.php` – load routes with `api` middleware group
+- [X] T010 Write database connection test in `tests/Feature/DatabaseTest.php` – confirm MySQL connection and expected tables exist (connectivity validation only — uses real MySQL; all other tests use in-memory SQLite per constitution)
+- [X] T011 Configure Pest coverage to 80% minimum in `phpunit.xml` with `<coverage><min>80%</min></coverage>`
 
 **Checkpoint**: Foundation ready – user story implementation can now begin.
 
@@ -56,14 +56,14 @@
 
 ### Tests for User Story 1
 
-- [ ] T012 [P] [US1] Write Pest test verifying project structure exists with expected directories
-- [ ] T013 [P] [US1] Write Pest test verifying default Laravel welcome page returns HTTP 200
+- [X] T012 [P] [US1] Write Pest test verifying project structure exists with expected directories
+- [X] T013 [P] [US1] Write Pest test verifying default Laravel welcome page returns HTTP 200
 
 ### Implementation for User Story 1
 
-- [ ] T014 [P] [US1] Create default API controller scaffold at `apps/backend/app/Http/Controllers/Controller.php`
-- [ ] T015 [US1] Verify `routes/web.php` returns default welcome view on GET `/`
-- [ ] T016 [US1] Verify `php artisan serve` boots without errors
+- [X] T014 [P] [US1] Create default API controller scaffold at `apps/backend/app/Http/Controllers/Controller.php`
+- [X] T015 [US1] Verify `routes/web.php` returns default welcome view on GET `/`
+- [X] T016 [US1] Verify `php artisan serve` boots without errors
 
 **Checkpoint**: Backend project is initialized and serves default content
 
@@ -77,16 +77,16 @@
 
 ### Tests for User Story 2
 
-- [ ] T017 [P] [US2] Write Pest test verifying database connection returns expected tables list
-- [ ] T018 [P] [US2] Write Pest test verifying `users` migration creates expected columns per data model
-- [ ] T019 [P] [US2] Write Pest test verifying `personal_access_tokens` migration creates expected columns
+- [X] T017 [P] [US2] Write Pest test verifying database connection returns expected tables list
+- [X] T018 [P] [US2] Write Pest test verifying `users` migration creates expected columns per data model
+- [X] T019 [P] [US2] Write Pest test verifying `personal_access_tokens` migration creates expected columns
 
 ### Implementation for User Story 2
 
-- [ ] T020 [US2] Configure MySQL connection settings in `apps/backend/config/database.php`
-- [ ] T021 [US2] Execute and verify default Laravel migrations in `apps/backend/database/migrations/`
-- [ ] T022 [US2] Verify `users` table schema matches data model in `specs/001-laravel-backend-scaffold/data-model.md`
-- [ ] T023 [US2] Verify `personal_access_tokens` table schema matches data model
+- [X] T020 [US2] Configure MySQL connection settings in `apps/backend/config/database.php`
+- [X] T021 [US2] Execute and verify default Laravel migrations in `apps/backend/database/migrations/`
+- [X] T022 [US2] Verify `users` table schema matches data model in `specs/001-laravel-backend-scaffold/data-model.md`
+- [X] T023 [US2] Verify `personal_access_tokens` table schema matches data model
 
 **Checkpoint**: MySQL database is connected and core schema exists
 
@@ -100,18 +100,18 @@
 
 ### Tests for User Story 3
 
-- [ ] T024 [P] [US3] Write contract test for health-check endpoint at `tests/Feature/HealthCheckTest.php`
-- [ ] T025 [P] [US3] Write contract test for unauthenticated access returning 401 JSON
-- [ ] T026 [US3] Write integration test for response envelope format consistency
+- [X] T024 [P] [US3] Write contract test for health-check endpoint at `tests/Feature/HealthCheckTest.php`
+- [X] T025 [P] [US3] Write contract test for unauthenticated access returning 401 JSON
+- [X] T026 [US3] Write integration test for response envelope format consistency
 
 ### Implementation for User Story 3
 
-- [ ] T027 [US3] Create health-check controller at `apps/backend/app/Http/Controllers/Api/HealthCheckController.php`
-- [ ] T028 [US3] Define health-check route in `apps/backend/routes/api.php` at `GET /api/health`
-- [ ] T029 [US3] Register API response envelope macro in `apps/backend/app/Providers/AppServiceProvider.php`
-- [ ] T030 [P] [US3] Configure CORS in `apps/backend/config/cors.php` for frontend origin
-- [ ] T031 [US3] Add `auth:sanctum` middleware to API route group in `apps/backend/routes/api.php`
-- [ ] T032 [US3] Verify health-check endpoint returns database connectivity status
+- [X] T027 [US3] Create health-check controller at `apps/backend/app/Http/Controllers/Api/HealthCheckController.php`
+- [X] T028 [US3] Define health-check route in `apps/backend/routes/api.php` at `GET /api/health`
+- [X] T029 [US3] Register API response envelope macro in `apps/backend/app/Providers/AppServiceProvider.php`
+- [X] T030 [P] [US3] Configure CORS in `apps/backend/config/cors.php` for frontend origin
+- [X] T031 [US3] Add `auth:sanctum` middleware to API route group in `apps/backend/routes/api.php`
+- [X] T032 [US3] Verify health-check endpoint returns database connectivity status
 
 **Checkpoint**: API foundation works - authenticated endpoints protected, health endpoint operational
 
@@ -125,14 +125,14 @@
 
 ### Tests for User Story 4
 
-- [ ] T033 [P] [US4] Write test verifying `.env.example` contains all required keys
-- [ ] T034 [US4] Write test verifying `php artisan config:cache` runs without errors
+- [X] T033 [P] [US4] Write test verifying `.env.example` contains all required keys
+- [X] T034 [US4] Write test verifying `php artisan config:cache` runs without errors
 
 ### Implementation for User Story 4
 
-- [ ] T035 [US4] Run `./vendor/bin/pint` to auto-fix PSR-12 style on all scaffolded files
-- [ ] T036 [US4] Run `vendor/bin/phpstan analyse --level=6` and fix any errors in scaffolded code
-- [ ] T037 [US4] Add `apps/backend/.env` to `.gitignore` and verify `.env.example` is tracked
+- [X] T035 [US4] Run `./vendor/bin/pint` to auto-fix PSR-12 style on all scaffolded files
+- [X] T036 [US4] Run `vendor/bin/phpstan analyse --level=6` and fix any errors in scaffolded code
+- [X] T037 [US4] Add `apps/backend/.env` to `.gitignore` and verify `.env.example` is tracked
 
 **Checkpoint**: Tooling is configured and passes on all scaffolded code
 
@@ -142,14 +142,14 @@
 
 **Purpose**: Full validation of the complete scaffold
 
-- [ ] T038 Run `php artisan test` and confirm full test suite passes (zero failures)
-- [ ] T039 [P] Run `vendor/bin/phpstan analyse --level=6` and confirm zero errors
-- [ ] T040 [P] Run `./vendor/bin/pint --test` and confirm zero style violations
-- [ ] T041 Run `php artisan migrate:fresh` from scratch and verify all tables created
-- [ ] T042 Run `php artisan route:list` and verify expected routes are registered
-- [ ] T043 Execute [quickstart.md](quickstart.md) validation scenarios end-to-end
-- [ ] T044 Verify `apps/backend/.env.example` has no secrets committed
-- [ ] T045 Update `AGENTS.md` to reference the completed feature
+- [X] T038 Run `php artisan test` and confirm full test suite passes (zero failures)
+- [X] T039 [P] Run `vendor/bin/phpstan analyse --level=6` and confirm zero errors
+- [X] T040 [P] Run `./vendor/bin/pint --test` and confirm zero style violations
+- [X] T041 Run `php artisan migrate:fresh` from scratch and verify all tables created
+- [X] T042 Run `php artisan route:list` and verify expected routes are registered
+- [X] T043 Execute [quickstart.md](quickstart.md) validation scenarios end-to-end
+- [X] T044 Verify `apps/backend/.env.example` has no secrets committed
+- [X] T045 Update `AGENTS.md` to reference the completed feature
 
 ---
 
