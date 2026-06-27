@@ -47,52 +47,110 @@
 
 ---
 
-## Phase 3: User Story 3 - Set Up API Structure (Priority: P2)
+## Phase 3: User Story 1 - Initialize Backend Project (Priority: P1) 🎯 MVP
 
-**Goal**: Expose a health-check endpoint, consistent JSON response envelope, and CORS configuration so frontend clients can communicate with the backend.
+**Goal**: The Laravel backend project is initialized with standard directory structure and the development server responds to requests.
 
-**Independent Test**: Hit `GET /api/health` and receive `{"success":true,"data":{"status":"healthy"}}` with HTTP 200.
+**Independent Test**: Start `php artisan serve` and verify the default response is served at `http://127.0.0.1:8000`; verify project directory contains expected subdirectories: `app/Http/Controllers/`, `database/migrations/`, `routes/`, `tests/`.
 
-### Tests for User Story 3 (per constitution: contract tests required) ⚠️
+### Tests for User Story 1
 
-- [ ] T011 [P] [US3] Write contract test for health-check response format in `tests/Feature/HealthTest.php`
+- [ ] T012 [P] [US1] Write Pest test verifying project structure exists with expected directories
+- [ ] T013 [P] [US1] Write Pest test verifying default Laravel welcome page returns HTTP 200
+
+### Implementation for User Story 1
+
+- [ ] T014 [P] [US1] Create default API controller scaffold at `apps/backend/app/Http/Controllers/Controller.php`
+- [ ] T015 [US1] Verify `routes/web.php` returns default welcome view on GET `/`
+- [ ] T016 [US1] Verify `php artisan serve` boots without errors
+
+**Checkpoint**: Backend project is initialized and serves default content
+
+---
+
+## Phase 4: User Story 2 - Configure Database Connection (Priority: P1)
+
+**Goal**: MySQL database is connected and default migrations execute successfully, creating the core schema for users, sessions, and API tokens.
+
+**Independent Test**: Run `php artisan migrate:fresh` and verify all expected tables exist in MySQL (`users`, `personal_access_tokens`, `sessions`, `cache`, `failed_jobs`); then run `php artisan migrate:status` and confirm all migrations are marked as "Ran".
+
+### Tests for User Story 2
+
+- [ ] T017 [P] [US2] Write Pest test verifying database connection returns expected tables list
+- [ ] T018 [P] [US2] Write Pest test verifying `users` migration creates expected columns per data model
+- [ ] T019 [P] [US2] Write Pest test verifying `personal_access_tokens` migration creates expected columns
+
+### Implementation for User Story 2
+
+- [ ] T020 [US2] Configure MySQL connection settings in `apps/backend/config/database.php`
+- [ ] T021 [US2] Execute and verify default Laravel migrations in `apps/backend/database/migrations/`
+- [ ] T022 [US2] Verify `users` table schema matches data model in `specs/001-laravel-backend-scaffold/data-model.md`
+- [ ] T023 [US2] Verify `personal_access_tokens` table schema matches data model
+
+**Checkpoint**: MySQL database is connected and core schema exists
+
+---
+
+## Phase 5: User Story 3 - Set Up API Structure (Priority: P2)
+
+**Goal**: API routing is configured with Sanctum token authentication, a health-check endpoint returns structured JSON, CORS is configured for frontend communication, and all responses follow the consistent envelope format.
+
+**Independent Test**: Send `GET /api/health` and receive `{"success":true,"data":{"status":"healthy","database":"connected"}}`; send `GET /api/user` without token and receive `401 Unauthenticated` JSON error.
+
+### Tests for User Story 3
+
+- [ ] T024 [P] [US3] Write contract test for health-check endpoint at `tests/Feature/HealthCheckTest.php`
+- [ ] T025 [P] [US3] Write contract test for unauthenticated access returning 401 JSON
+- [ ] T026 [US3] Write integration test for response envelope format consistency
 
 ### Implementation for User Story 3
 
-- [ ] T012 [P] [US3] Create JSON response envelope macro in `app/Providers/AppServiceProvider.php` – register `success()` and `error()` response macros with `{ success: bool, data: ..., error: ... }` format
-- [ ] T013 [US3] Create health-check endpoint in `routes/api.php` and `app/Http/Controllers/Api/HealthController.php` – return app status and DB connection status
-- [ ] T014 [US3] Configure CORS in `config/cors.php` – set allowed origins, methods, headers
+- [ ] T027 [US3] Install Laravel Sanctum via `php artisan install:api`
+- [ ] T028 [US3] Create health-check controller at `apps/backend/app/Http/Controllers/Api/HealthCheckController.php`
+- [ ] T029 [US3] Define health-check route in `apps/backend/routes/api.php` at `GET /api/health`
+- [ ] T030 [US3] Register API response envelope macro in `apps/backend/app/Providers/AppServiceProvider.php`
+- [ ] T031 [P] [US3] Configure CORS in `apps/backend/config/cors.php` for frontend origin
+- [ ] T032 [US3] Add `auth:sanctum` middleware to API route group in `apps/backend/routes/api.php`
+- [ ] T033 [US3] Verify health-check endpoint returns database connectivity status
 
-**Checkpoint**: API structure is functional and independently testable via health-check endpoint.
+**Checkpoint**: API foundation works - authenticated endpoints protected, health endpoint operational
 
 ---
 
-## Phase 4: User Story 4 - Configure Environment & Tooling (Priority: P3)
+## Phase 6: User Story 4 - Configure Environment & Tooling (Priority: P3)
 
-**Goal**: Set up code quality tools (PHPStan, Laravel Pint) and finalize environment template so the project meets constitutional standards.
+**Goal**: Environment template is complete, code quality tools pass on scaffolded code, and static analysis confirms zero errors.
 
-**Independent Test**: Run `vendor/bin/phpstan analyse --level=6` and `vendor/bin/pint --test` – both pass with zero errors for scaffolded code.
+**Independent Test**: Run `./vendor/bin/pint --test` (zero violations); run `vendor/bin/phpstan analyse --level=6` (zero errors); verify `.env.example` contains all keys: `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`, `APP_KEY`, `APP_URL`, `SANCTUM_STATEFUL_DOMAINS`.
+
+### Tests for User Story 4
+
+- [ ] T034 [P] [US4] Write test verifying `.env.example` contains all required keys
+- [ ] T035 [US4] Write test verifying `php artisan config:cache` runs without errors
 
 ### Implementation for User Story 4
 
-- [ ] T015 [P] [US4] Configure PHPStan at level 6 in `phpstan.neon` – add `phpstan/phpstan-laravel` extension, scan `apps/backend/app` and `apps/backend/tests`
-- [ ] T016 [P] [US4] Configure Laravel Pint in `pint.json` – set PSR-12 preset, target `apps/backend/app` and `apps/backend/tests`
-- [ ] T017 [US4] Finalize `.env.example` – ensure all config keys documented with placeholder values, no real secrets
-- [ ] T018 [US4] Write tooling validation test in `tests/Feature/ToolingTest.php` – verify PHPStan and Pint run without errors
+- [ ] T036 [US4] Extend `apps/backend/.env.example` with all required configuration keys
+- [ ] T037 [US4] Run `./vendor/bin/pint` to auto-fix PSR-12 style on all scaffolded files
+- [ ] T038 [US4] Run `vendor/bin/phpstan analyse --level=6` and fix any errors in scaffolded code
+- [ ] T039 [US4] Add `apps/backend/.env` to `.gitignore` and verify `.env.example` is tracked
 
-**Checkpoint**: All code quality gates pass. Tooling enforces constitutional standards.
+**Checkpoint**: Tooling is configured and passes on all scaffolded code
 
 ---
 
-## Phase 5: Polish & Cross-Cutting Concerns
+## Phase 7: Polish & Cross-Cutting Concerns
 
-**Purpose**: Final validation and cleanup across all stories.
+**Purpose**: Full validation of the complete scaffold
 
-- [ ] T019 Run full Pest test suite (`php artisan test`) and fix any failures
-- [ ] T020 [P] Run PHPStan level 6 and fix reported issues
-- [ ] T021 [P] Run Laravel Pint and fix style violations
-- [ ] T022 Validate all quickstart.md scenarios manually – server start, health check, migrations, protected route, test suite
-- [ ] T023 [P] Remove debug artifacts, commented code, and unused imports across `apps/backend/`
+- [ ] T040 Run `php artisan test` and confirm full test suite passes (zero failures)
+- [ ] T041 [P] Run `vendor/bin/phpstan analyse --level=6` and confirm zero errors
+- [ ] T042 [P] Run `./vendor/bin/pint --test` and confirm zero style violations
+- [ ] T043 Run `php artisan migrate:fresh` from scratch and verify all tables created
+- [ ] T044 Run `php artisan route:list` and verify expected routes are registered
+- [ ] T045 Execute [quickstart.md](quickstart.md) validation scenarios end-to-end
+- [ ] T046 Verify `apps/backend/.env.example` has no secrets committed
+- [ ] T047 Update `AGENTS.md` to reference the completed feature
 
 ---
 
@@ -100,61 +158,70 @@
 
 ### Phase Dependencies
 
-- **Setup (Phase 1)**: No dependencies – can start immediately
-- **Foundational (Phase 2)**: Depends on Setup completion – BLOCKS all user stories
-- **User Story 3 (Phase 3)**: Depends on Foundational completion – independent of US4
-- **User Story 4 (Phase 4)**: Depends on Foundational completion – independent of US3
-- **Polish (Phase 5)**: Depends on Phase 1–4 completion
+- **Setup (Phase 1)**: No dependencies - can start immediately
+- **Foundational (Phase 2)**: Depends on Setup completion - BLOCKS all user stories
+- **User Stories (Phase 3-6)**: All depend on Foundational phase completion
+  - US1 and US2 can proceed in parallel after Foundational
+  - US3 depends on US2 (database must be ready for health check)
+  - US4 can run in parallel with US3
+- **Polish (Phase 7)**: Depends on all user stories being complete
 
 ### User Story Dependencies
 
-- **User Story 3 (P2)**: Can start after Foundational – no dependency on US4
-- **User Story 4 (P3)**: Can start after Foundational – no dependency on US3
+- **User Story 1 (P1)**: Can start after Foundational - no dependencies on other stories
+- **User Story 2 (P1)**: Can start after Foundational - no dependencies on other stories
+- **User Story 3 (P2)**: Depends on US2 (database health check) - independently testable via mock
+- **User Story 4 (P3)**: Can start after Foundational - no dependencies on other stories
 
 ### Within Each User Story
 
-- Tests MUST be written before implementation (TDD)
-- Core implementation before integration
+- Tests MUST be written and FAIL before implementation (TDD)
+- Core implementation before validation
 - Story complete before moving to next priority
 
 ### Parallel Opportunities
 
 - All Setup tasks marked [P] can run in parallel
 - All Foundational tasks marked [P] can run in parallel
-- US3 and US4 can be implemented in parallel (different concerns)
-- All tests within a story marked [P] can run in parallel
-- Different user stories can be worked on in parallel by different team members
+- US1 and US2 can run in parallel after Foundational
+- US4 can run in parallel with US3
+- All tests for a user story marked [P] can run in parallel
+- Models/tables within a story marked [P] can run in parallel
 
 ---
 
 ## Parallel Example: User Story 3
 
 ```bash
-# Launch contract test + implementation simultaneously:
-Task: "Write contract test for health-check in tests/Feature/HealthTest.php"
-Task: "Create JSON response envelope macro in app/Providers/AppServiceProvider.php"
-Task: "Create health-check endpoint in routes/api.php and HealthController.php"
-Task: "Configure CORS in config/cors.php"
+# Launch all tests for User Story 3 together:
+Task: "Write contract test for health-check endpoint at tests/Feature/HealthCheckTest.php"
+Task: "Write contract test for unauthenticated access returning 401 JSON"
+
+# Launch all implementation tasks for User Story 3 together:
+Task: "Install Laravel Sanctum via php artisan install:api"
+Task: "Configure CORS in apps/backend/config/cors.php"
 ```
 
 ---
 
 ## Implementation Strategy
 
-### MVP First (User Story 3 Only)
+### MVP First (User Story 1 + 2)
 
 1. Complete Phase 1: Setup
-2. Complete Phase 2: Foundational (CRITICAL – blocks all stories)
-3. Complete Phase 3: User Story 3 (health check, envelope, CORS)
-4. **STOP and VALIDATE**: Test API health endpoint independently
-5. Deploy/demo if ready
+2. Complete Phase 2: Foundational (CRITICAL - blocks all stories)
+3. Complete Phase 3: User Story 1 (Initialize backend project)
+4. Complete Phase 4: User Story 2 (Configure database)
+5. **STOP and VALIDATE**: Test US1 and US2 independently
+6. Deploy/demo if ready (scaffold foundation exists)
 
 ### Incremental Delivery
 
-1. Setup + Foundational → Foundation ready
-2. Add User Story 3 → Test independently → Deploy/Demo (MVP!)
-3. Add User Story 4 → Test independently → Deploy/Demo
-4. Each story adds value without breaking previous stories
+1. Complete Setup + Foundational → Foundation ready
+2. Add User Story 1 + 2 → Backend project with database → Deploy/Demo (MVP!)
+3. Add User Story 3 → API structure with auth and health check → Deploy/Demo
+4. Add User Story 4 → Tooling and environment config → Deploy/Demo
+5. Each phase adds value independently
 
 ### Parallel Team Strategy
 
@@ -162,6 +229,21 @@ With multiple developers:
 
 1. Team completes Setup + Foundational together
 2. Once Foundational is done:
+   - Developer A: User Story 1 (project init + structure)
+   - Developer B: User Story 2 (database + migrations)
+3. After US1 + US2:
    - Developer A: User Story 3 (API structure)
-   - Developer B: User Story 4 (Tooling)
-3. Stories complete and integrate independently
+   - Developer B: User Story 4 (tooling)
+4. All stories integrate independently
+
+---
+
+## Notes
+
+- [P] tasks = different files, no dependencies
+- [Story] label maps task to specific user story for traceability
+- Each user story should be independently completable and testable
+- Verify tests fail before implementing
+- Commit after each task or logical group
+- Stop at any checkpoint to validate story independently
+- Avoid: vague tasks, same file conflicts, cross-story dependencies that break independence
