@@ -30,7 +30,7 @@ description: "Task list for Laravel Sanctum Authentication feature"
 
 **Purpose**: Verify existing scaffold is ready — Sanctum is already installed, User model has `HasApiTokens`, response macros and exception handling are already configured. No new setup tasks needed.
 
-- [ ] T001 Verify existing scaffold: Sanctum installed, User model has HasApiTokens, response macros in AppServiceProvider, exception handler in bootstrap/app.php
+- [X] T001 Verify existing scaffold: Sanctum installed, User model has HasApiTokens, response macros in AppServiceProvider, exception handler in bootstrap/app.php
 
 ---
 
@@ -38,9 +38,9 @@ description: "Task list for Laravel Sanctum Authentication feature"
 
 **Purpose**: Core infrastructure that MUST be complete before ANY user story can be implemented.
 
-- [ ] T002 Configure rate limiting for auth endpoints in `apps/backend/app/Providers/AppServiceProvider.php` (define rate limiter for auth routes, 60 attempts/minute/IP)
-- [ ] T003 [P] Create `AuthController` skeleton in `apps/backend/app/Http/Controllers/Api/AuthController.php` with placeholder methods (register, login, logout, tokens, revokeToken)
-- [ ] T004 [P] Remove inline `/api/user` closure from `apps/backend/routes/api.php` and refactor to use `AuthController@user` method
+- [X] T002 Configure rate limiting for auth endpoints in `apps/backend/app/Providers/AppServiceProvider.php` (define rate limiter for auth routes, 60 attempts/minute/IP)
+- [X] T003 [P] Create `AuthController` skeleton in `apps/backend/app/Http/Controllers/Api/AuthController.php` with placeholder methods (register, login, logout, tokens, revokeToken)
+- [X] T004 [P] Remove inline `/api/user` closure from `apps/backend/routes/api.php` and refactor to use `AuthController@user` method
 
 **Checkpoint**: Foundation ready — user story implementation can now begin.
 
@@ -54,16 +54,16 @@ description: "Task list for Laravel Sanctum Authentication feature"
 
 ### Implementation for User Story 1
 
-- [ ] T005 [P] [US1] Create `RegisterRequest` form request in `apps/backend/app/Http/Requests/RegisterRequest.php` with validation rules (name required|string|max:255, email required|string|email|unique:users, password required|string|min:8|confirmed)
-- [ ] T006 [US1] Implement `register()` method in `apps/backend/app/Http/Controllers/Api/AuthController.php` — validate request, create User, create Sanctum token, return 201 with `response()->success(['user' => $user, 'token' => $token])`
-- [ ] T007 [US1] Add public `POST /api/register` route in `apps/backend/routes/api.php` pointing to `AuthController@register`
+- [X] T005 [P] [US1] Create `RegisterRequest` form request in `apps/backend/app/Http/Requests/RegisterRequest.php` with validation rules (name required|string|max:255, email required|string|email|unique:users, password required|string|min:8|confirmed)
+- [X] T006 [US1] Implement `register()` method in `apps/backend/app/Http/Controllers/Api/AuthController.php` — validate request, create User, create Sanctum token, return 201 with `response()->success(['user' => $user, 'token' => $token])`
+- [X] T007 [US1] Add public `POST /api/register` route in `apps/backend/routes/api.php` pointing to `AuthController@register`
 
 ### Tests for User Story 1
 
-- [ ] T008 [US1] Create registration test file at `apps/backend/tests/Feature/Api/Auth/RegisterTest.php` — test successful registration returns 201 with user+token
-- [ ] T009 [P] [US1] Test duplicate email returns 422 validation error in `apps/backend/tests/Feature/Api/Auth/RegisterTest.php`
-- [ ] T010 [P] [US1] Test weak password (under 8 chars) returns 422 validation error in `apps/backend/tests/Feature/Api/Auth/RegisterTest.php`
-- [ ] T011 [P] [US1] Test missing fields return 422 validation errors in `apps/backend/tests/Feature/Api/Auth/RegisterTest.php`
+- [X] T008 [US1] Create registration test file at `apps/backend/tests/Feature/Api/Auth/RegisterTest.php` — test successful registration returns 201 with user+token
+- [X] T009 [P] [US1] Test duplicate email returns 422 validation error in `apps/backend/tests/Feature/Api/Auth/RegisterTest.php`
+- [X] T010 [P] [US1] Test weak password (under 8 chars) returns 422 validation error in `apps/backend/tests/Feature/Api/Auth/RegisterTest.php`
+- [X] T011 [P] [US1] Test missing fields return 422 validation errors in `apps/backend/tests/Feature/Api/Auth/RegisterTest.php`
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently. New users can register.
 
@@ -77,16 +77,16 @@ description: "Task list for Laravel Sanctum Authentication feature"
 
 ### Implementation for User Story 2
 
-- [ ] T012 [P] [US2] Create `LoginRequest` form request in `apps/backend/app/Http/Requests/LoginRequest.php` with validation rules (email required|string|email, password required|string)
-- [ ] T013 [US2] Implement `login()` method in `apps/backend/app/Http/Controllers/Api/AuthController.php` — validate request, attempt auth (via `Hash::check` or `Auth::attempt`), return 200 with token or 401 with generic error
-- [ ] T014 [US2] Add public `POST /api/login` route in `apps/backend/routes/api.php` pointing to `AuthController@login`
+- [X] T012 [P] [US2] Create `LoginRequest` form request in `apps/backend/app/Http/Requests/LoginRequest.php` with validation rules (email required|string|email, password required|string)
+- [X] T013 [US2] Implement `login()` method in `apps/backend/app/Http/Controllers/Api/AuthController.php` — validate request, attempt auth (via `Hash::check` or `Auth::attempt`), return 200 with token or 401 with generic error
+- [X] T014 [US2] Add public `POST /api/login` route in `apps/backend/routes/api.php` pointing to `AuthController@login`
 
 ### Tests for User Story 2
 
-- [ ] T015 [US2] Create login test file at `apps/backend/tests/Feature/Api/Auth/LoginTest.php` — test successful login returns 200 with user+token
-- [ ] T016 [P] [US2] Test invalid password returns 401 with generic "Invalid credentials." error in `apps/backend/tests/Feature/Api/Auth/LoginTest.php`
-- [ ] T017 [P] [US2] Test unregistered email returns 401 with generic error (same message as invalid password) in `apps/backend/tests/Feature/Api/Auth/LoginTest.php`
-- [ ] T018 [P] [US2] Test missing fields return 422 validation errors in `apps/backend/tests/Feature/Api/Auth/LoginTest.php`
+- [X] T015 [US2] Create login test file at `apps/backend/tests/Feature/Api/Auth/LoginTest.php` — test successful login returns 200 with user+token
+- [X] T016 [P] [US2] Test invalid password returns 401 with generic "Invalid credentials." error in `apps/backend/tests/Feature/Api/Auth/LoginTest.php`
+- [X] T017 [P] [US2] Test unregistered email returns 401 with generic error (same message as invalid password) in `apps/backend/tests/Feature/Api/Auth/LoginTest.php`
+- [X] T018 [P] [US2] Test missing fields return 422 validation errors in `apps/backend/tests/Feature/Api/Auth/LoginTest.php`
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should work. Users can register and log in.
 
@@ -100,14 +100,14 @@ description: "Task list for Laravel Sanctum Authentication feature"
 
 ### Implementation for User Story 3
 
-- [ ] T019 [US3] Implement `logout()` method in `apps/backend/app/Http/Controllers/Api/AuthController.php` — revoke current token via `$request->user()->currentAccessToken()->delete()`, return 200 with "Logged out successfully."
-- [ ] T020 [US3] Add protected `POST /api/logout` route in `apps/backend/routes/api.php` inside the `auth:sanctum` middleware group pointing to `AuthController@logout`
+- [X] T019 [US3] Implement `logout()` method in `apps/backend/app/Http/Controllers/Api/AuthController.php` — revoke current token via `$request->user()->currentAccessToken()->delete()`, return 200 with "Logged out successfully."
+- [X] T020 [US3] Add protected `POST /api/logout` route in `apps/backend/routes/api.php` inside the `auth:sanctum` middleware group pointing to `AuthController@logout`
 
 ### Tests for User Story 3
 
-- [ ] T021 [US3] Create logout test file at `apps/backend/tests/Feature/Api/Auth/LogoutTest.php` — test successful logout revokes token and returns 200
-- [ ] T022 [P] [US3] Test accessing a protected endpoint with a revoked token returns 401 in `apps/backend/tests/Feature/Api/Auth/LogoutTest.php`
-- [ ] T023 [P] [US3] Test logout without token returns 401 in `apps/backend/tests/Feature/Api/Auth/LogoutTest.php`
+- [X] T021 [US3] Create logout test file at `apps/backend/tests/Feature/Api/Auth/LogoutTest.php` — test successful logout revokes token and returns 200
+- [X] T022 [P] [US3] Test accessing a protected endpoint with a revoked token returns 401 in `apps/backend/tests/Feature/Api/Auth/LogoutTest.php`
+- [X] T023 [P] [US3] Test logout without token returns 401 in `apps/backend/tests/Feature/Api/Auth/LogoutTest.php`
 
 **Checkpoint**: Core auth lifecycle complete — users can register, log in, and log out.
 
@@ -121,17 +121,17 @@ description: "Task list for Laravel Sanctum Authentication feature"
 
 ### Implementation for User Story 4
 
-- [ ] T024 [US4] Implement `tokens()` method in `apps/backend/app/Http/Controllers/Api/AuthController.php` — return user's tokens (id, name, created_at, last_used_at) via `$request->user()->tokens()->orderBy('created_at', 'desc')->get()`
-- [ ] T025 [US4] Add protected `GET /api/tokens` route in `apps/backend/routes/api.php` inside `auth:sanctum` group pointing to `AuthController@tokens`
-- [ ] T026 [US4] Implement `revokeToken()` method in `apps/backend/app/Http/Controllers/Api/AuthController.php` — find token by id, verify it belongs to the user, delete it, return 200 or 403/404
-- [ ] T027 [US4] Add protected `DELETE /api/tokens/{id}` route in `apps/backend/routes/api.php` inside `auth:sanctum` group pointing to `AuthController@revokeToken`
+- [X] T024 [US4] Implement `tokens()` method in `apps/backend/app/Http/Controllers/Api/AuthController.php` — return user's tokens (id, name, created_at, last_used_at) via `$request->user()->tokens()->orderBy('created_at', 'desc')->get()`
+- [X] T025 [US4] Add protected `GET /api/tokens` route in `apps/backend/routes/api.php` inside `auth:sanctum` group pointing to `AuthController@tokens`
+- [X] T026 [US4] Implement `revokeToken()` method in `apps/backend/app/Http/Controllers/Api/AuthController.php` — find token by id, verify it belongs to the user, delete it, return 200 or 403/404
+- [X] T027 [US4] Add protected `DELETE /api/tokens/{id}` route in `apps/backend/routes/api.php` inside `auth:sanctum` group pointing to `AuthController@revokeToken`
 
 ### Tests for User Story 4
 
-- [ ] T028 [US4] Create token management test file at `apps/backend/tests/Feature/Api/Auth/TokenManagementTest.php` — test listing tokens returns all active tokens
-- [ ] T029 [P] [US4] Test revoking a specific token removes it from the list and invalidates it in `apps/backend/tests/Feature/Api/Auth/TokenManagementTest.php`
-- [ ] T030 [P] [US4] Test revoking another user's token returns 403 in `apps/backend/tests/Feature/Api/Auth/TokenManagementTest.php`
-- [ ] T031 [P] [US4] Test revoking a non-existent token returns 404 in `apps/backend/tests/Feature/Api/Auth/TokenManagementTest.php`
+- [X] T028 [US4] Create token management test file at `apps/backend/tests/Feature/Api/Auth/TokenManagementTest.php` — test listing tokens returns all active tokens
+- [X] T029 [P] [US4] Test revoking a specific token removes it from the list and invalidates it in `apps/backend/tests/Feature/Api/Auth/TokenManagementTest.php`
+- [X] T030 [P] [US4] Test revoking another user's token returns 403 in `apps/backend/tests/Feature/Api/Auth/TokenManagementTest.php`
+- [X] T031 [P] [US4] Test revoking a non-existent token returns 404 in `apps/backend/tests/Feature/Api/Auth/TokenManagementTest.php`
 
 **Checkpoint**: All user stories functional. Users have full auth lifecycle and token management.
 
@@ -141,11 +141,11 @@ description: "Task list for Laravel Sanctum Authentication feature"
 
 **Purpose**: Improvements that affect multiple user stories and final validation.
 
-- [ ] T032 Run full test suite: `cd apps/backend && php artisan test` — verify all existing tests + new auth tests pass
-- [ ] T033 [P] Run static analysis: `cd apps/backend && vendor/bin/phpstan analyse --level=6` — verify zero errors
-- [ ] T034 [P] Run style check: `cd apps/backend && vendor/bin/pint --test` — verify zero violations
-- [ ] T035 Update `AGENTS.md` to mark feature 003 as completed with summary description
-- [ ] T036 Run quickstart validation scenarios from `specs/003-laravel-sanctum-auth/quickstart.md`
+- [X] T032 Run full test suite: `cd apps/backend && php artisan test` — verify all existing tests + new auth tests pass
+- [X] T033 [P] Run static analysis: `cd apps/backend && vendor/bin/phpstan analyse --level=6` — verify zero errors
+- [X] T034 [P] Run style check: `cd apps/backend && vendor/bin/pint --test` — verify zero violations
+- [X] T035 Update `AGENTS.md` to mark feature 003 as completed with summary description
+- [X] T036 Run quickstart validation scenarios from `specs/003-laravel-sanctum-auth/quickstart.md`
 
 ---
 

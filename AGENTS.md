@@ -42,6 +42,22 @@ React + Vite frontend scaffold at `apps/frontend/` with:
 **Build**: `cd apps/frontend && npm run build`
 **Lint**: `cd apps/frontend && npm run lint`
 
+### 003 - Laravel Sanctum Authentication (2026-06-27)
+
+Backend authentication API at `apps/backend/` with:
+- User registration endpoint (`POST /api/register`) with form request validation
+- User login endpoint (`POST /api/login`) with bcrypt password verification
+- User logout endpoint (`POST /api/logout`) with Sanctum token revocation
+- Token management endpoints (`GET /api/tokens`, `DELETE /api/tokens/{id}`)
+- Rate limiting on auth endpoints (60 attempts/minute/IP)
+- Consistent JSON error envelope for validation errors
+- Pest test suite (14 new tests in `tests/Feature/Api/Auth/`)
+- PHPStan level 6 compliance (zero errors)
+- PSR-12 style compliance via Pint (zero violations)
+
+**Run tests**: `cd apps/backend && php artisan test`
+**Run auth endpoint tests**: `cd apps/backend && php artisan test --filter="Auth"`
+
 ### 004 - Post-Login Dashboard (2026-06-27)
 
 Frontend post-login dashboard at `apps/frontend/` with:

@@ -2,8 +2,11 @@
 
 namespace App\Providers;
 
+use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Routing\ResponseFactory;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -22,6 +25,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->registerResponseMacros();
+        $this->configureRateLimiting();
     }
 
     /**
@@ -55,6 +59,16 @@ class AppServiceProvider extends ServiceProvider
             }
 
             return response()->json(['success' => false, 'error' => $error], $status);
+        });
+    }
+
+    /**
+     * Configure rate limiting for authentication endpoints.
+     */
+    private function configureRateLimiting(): void
+    {
+        RateLimiter::for('auth', function (Request $request): Limit {
+            return Limit::perMinute(60)->by($request->ip());
         });
     }
 }

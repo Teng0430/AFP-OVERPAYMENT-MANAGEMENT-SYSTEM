@@ -1,0 +1,68 @@
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use App\Http\Requests\LoginRequest;
+use App\Http\Requests\RegisterRequest;
+use App\Models\User;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+
+class AuthController extends Controller
+{
+    public function register(RegisterRequest $request): JsonResponse
+    {
+        $user = User::create($request->validated());
+
+        $token = $user->createToken('auth-token')->plainTextToken;
+
+        return response()->success(['user' => $user, 'token' => $token], 201);
+    }
+
+    public function login(LoginRequest $request): JsonResponse
+    {
+        $user = User::where('email', $request->input('email'))->first();
+
+        if (! $user || ! Hash::check($request->input('password'), $user->password)) {
+            return response()->error('Invalid credentials.', 'AUTHENTICATION_ERROR', 401);
+        }
+
+        $token = $user->createToken('auth-token')->plainTextToken;
+
+        return response()->success(['user' => $user, 'token' => $token]);
+    }
+
+    public function logout(Request $request): JsonResponse
+    {
+        $request->user()->currentAccessToken()->delete();
+
+        return response()->success(['message' => 'Logged out successfully.']);
+    }
+
+    public function user(Request $request): JsonResponse
+    {
+        return response()->success(['user' => $request->user()]);
+    }
+
+    public function tokens(Request $request): JsonResponse
+    {
+        $tokens = $request->user()->tokens()->orderBy('created_at', 'desc')->get(['id', 'name', 'created_at', 'last_used_at']);
+
+        return response()->success(['tokens' => $tokens]);
+    }
+
+    public function revokeToken(Request $request, string $id): JsonResponse
+    {
+        $token = $request->user()->tokens()->find($id);
+
+        if (! $token) {
+            return response()->error('Token not found.', 'NOT_FOUND', 404);
+        }
+
+        $token->delete();
+
+        return response()->success(['message' => 'Token revoked.']);
+    }
+}

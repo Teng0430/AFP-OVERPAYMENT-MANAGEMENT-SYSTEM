@@ -6,6 +6,7 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use Laravel\Sanctum\Http\Middleware\CheckAbilities;
 use Laravel\Sanctum\Http\Middleware\CheckForAnyAbility;
 use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
@@ -33,6 +34,15 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->render(function (AuthenticationException $e, Request $request): ?JsonResponse {
             if ($request->is('api/*') || $request->expectsJson()) {
                 return response()->error('Unauthenticated.', 'UNAUTHENTICATED', 401);
+            }
+
+            return null;
+        });
+
+        // Return JSON error envelope for validation errors on API routes
+        $exceptions->render(function (ValidationException $e, Request $request): ?JsonResponse {
+            if ($request->is('api/*') || $request->expectsJson()) {
+                return response()->error($e->getMessage(), 'VALIDATION_ERROR', 422, $e->errors());
             }
 
             return null;
