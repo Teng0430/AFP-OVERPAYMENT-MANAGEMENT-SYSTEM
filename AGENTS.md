@@ -1,7 +1,7 @@
 <!-- SPECKIT START -->
 For additional context about technologies to be used, project structure,
 shell commands, and other important information, read the current plan
-at specs/002-react-frontend-scaffold/plan.md
+at specs/003-laravel-sanctum-auth/plan.md
 <!-- SPECKIT END -->
 
 ## Completed Features
@@ -40,4 +40,20 @@ React + Vite frontend scaffold at `apps/frontend/` with:
 **Run dev server**: `cd apps/frontend && npm run dev`
 **Run tests**: `cd apps/frontend && npm test`
 **Build**: `cd apps/frontend && npm run build`
+**Lint**: `cd apps/frontend && npm run lint`
+
+### 004 - Post-Login Dashboard (2026-06-27)
+
+Frontend post-login dashboard at `apps/frontend/` with:
+- Dashboard page as authenticated landing page after login
+- Persistent navigation bar with user profile image and name
+- Logout functionality from navigation bar dropdown
+- Protected route handling (redirect unauthenticated users to login)
+- Auth state management via React Context + useAuth hook
+- Auth service module for login, register, logout, getUser API calls
+- Placeholder avatar for users without profile images
+- WCAG 2.1 AA accessible nav bar with keyboard navigation and ARIA labels
+
+**Run frontend tests**: `cd apps/frontend && npm test`
+**Type check**: `cd apps/frontend && npx tsc --noEmit`
 **Lint**: `cd apps/frontend && npm run lint`
