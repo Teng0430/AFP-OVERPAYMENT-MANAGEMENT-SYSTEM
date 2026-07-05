@@ -15,30 +15,48 @@ function renderWithProviders(ui: React.ReactElement) {
 }
 
 describe('LoginPage', () => {
-  it('renders sign in heading', () => {
+  it('renders system title', () => {
     renderWithProviders(<LoginPage />);
-    expect(screen.getAllByRole('heading', { name: /sign in/i })[0]).toBeInTheDocument();
+    expect(screen.getByText(/AFP Pension Overpayment/i)).toBeInTheDocument();
+    expect(screen.getByText(/Monitoring System/i)).toBeInTheDocument();
   });
 
   it('renders email and password fields', () => {
     renderWithProviders(<LoginPage />);
-    expect(screen.getAllByLabelText(/email/i)[0]).toBeInTheDocument();
-    expect(screen.getAllByLabelText(/password/i)[0]).toBeInTheDocument();
+    expect(screen.getByRole('textbox', { name: /email/i })).toBeInTheDocument();
+    expect(screen.getAllByTestId('password-input').length).toBeGreaterThan(0);
   });
 
   it('renders submit button', () => {
     renderWithProviders(<LoginPage />);
-    expect(screen.getAllByRole('button', { name: /sign in/i })[0]).toBeInTheDocument();
+    const buttons = screen.getAllByRole('button', { name: /sign in/i });
+    expect(buttons.length).toBeGreaterThan(0);
   });
 
-  it('renders link to register page', () => {
+  it('renders security badges', () => {
     renderWithProviders(<LoginPage />);
-    expect(screen.getAllByRole('link', { name: /register/i })[0]).toBeInTheDocument();
+    const secureLogins = screen.getAllByText(/Secure Login/i);
+    expect(secureLogins.length).toBeGreaterThan(0);
+    const rbac = screen.getAllByText(/RBAC Enabled/i);
+    expect(rbac.length).toBeGreaterThan(0);
+  });
+
+  it('renders AFP Finance Center footer', () => {
+    renderWithProviders(<LoginPage />);
+    const footers = screen.getAllByText(/Finance Center/i);
+    expect(footers.length).toBeGreaterThan(0);
+    const armedForces = screen.getAllByText(/Armed Forces of the Philippines/i);
+    expect(armedForces.length).toBeGreaterThan(0);
   });
 
   it('shows logout message when query param present', () => {
-    window.history.pushState({}, '', '/login?logout=Logged+out+successfully.');
-    renderWithProviders(<LoginPage />);
-    expect(screen.getAllByText(/logged out successfully/i)[0]).toBeInTheDocument();
+    render(
+      <MemoryRouter initialEntries={['/login?logout=Logged+out+successfully.']}>
+        <AuthProvider>
+          <LoginPage />
+        </AuthProvider>
+      </MemoryRouter>
+    );
+    expect(screen.getByText(/logged out successfully/i)).toBeInTheDocument();
   });
 });

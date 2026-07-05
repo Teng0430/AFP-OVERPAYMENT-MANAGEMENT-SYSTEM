@@ -2,10 +2,12 @@
 
 namespace App\Providers;
 
+use App\Http\Middleware\CheckRole;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\ResponseFactory;
+use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 
@@ -26,6 +28,7 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->registerResponseMacros();
         $this->configureRateLimiting();
+        $this->configureMiddlewareAliases();
     }
 
     /**
@@ -70,5 +73,16 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('auth', function (Request $request): Limit {
             return Limit::perMinute(60)->by($request->ip());
         });
+    }
+
+    /**
+     * Register route middleware aliases.
+     */
+    private function configureMiddlewareAliases(): void
+    {
+        /** @var Router $router */
+        $router = $this->app->make(Router::class);
+
+        $router->aliasMiddleware('role', CheckRole::class);
     }
 }

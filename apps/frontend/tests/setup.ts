@@ -1,35 +1,29 @@
 import '@testing-library/jest-dom/vitest';
+import { vi } from 'vitest';
+import React from 'react';
 
-class LocalStorageMock {
-  private store: Record<string, string> = {};
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const MotionComponent = React.forwardRef<any, any>(
+  ({ children, className, style, ...props }, ref) => {
+    const filtered: Record<string, unknown> = {};
+    for (const [key, val] of Object.entries(props)) {
+      if (!['aria-', 'role', 'id', 'tabIndex', 'title'].some((p) => key.startsWith(p) || key === p)) continue;
+      filtered[key] = val;
+    }
+    return React.createElement('div', { ref, className, style, ...filtered }, children as React.ReactNode);
+  },
+);
+MotionComponent.displayName = 'motion-component';
 
-  getItem(key: string): string | null {
-    return this.store[key] ?? null;
-  }
+vi.mock('framer-motion', () => {
+  const motion = new Proxy({}, {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    get: () => MotionComponent as any,
+  });
 
-  setItem(key: string, value: string): void {
-    this.store[key] = value;
-  }
-
-  removeItem(key: string): void {
-    delete this.store[key];
-  }
-
-  clear(): void {
-    this.store = {};
-  }
-
-  get length(): number {
-    return Object.keys(this.store).length;
-  }
-
-  key(index: number): string | null {
-    return Object.keys(this.store)[index] ?? null;
-  }
-}
-
-Object.defineProperty(globalThis, 'localStorage', {
-  value: new LocalStorageMock(),
-  writable: true,
-  configurable: true,
+  return {
+    motion,
+    AnimatePresence: ({ children }: { children?: React.ReactNode }) => React.createElement(React.Fragment, null, children),
+    useReducedMotion: () => false,
+  };
 });

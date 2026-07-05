@@ -1,24 +1,18 @@
-import { Navigate } from 'react-router-dom';
+import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import NavBar from '../components/NavBar';
 
-function ProtectedRoute({ children }: { children: React.ReactNode }) {
+function ProtectedRoute() {
   const { isAuthenticated, isLoading } = useAuth();
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <div className="flex h-screen items-center justify-center">Loading...</div>;
   }
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
 
-  return (
-    <>
-      <NavBar />
-      {children}
-    </>
-  );
+  return <Outlet />;
 }
 
 export default ProtectedRoute;

@@ -29,6 +29,7 @@ describe('ProtectedRoute', () => {
         <TestChild />
       </ProtectedRoute>
     );
-    expect(screen.getAllByRole('heading', { name: /sign in/i })[0]).toBeInTheDocument();
+    expect(screen.getByText(/AFP Pension Overpayment/i)).toBeInTheDocument();
+    expect(screen.queryByText(/Protected Content/i)).not.toBeInTheDocument();
   });
 });

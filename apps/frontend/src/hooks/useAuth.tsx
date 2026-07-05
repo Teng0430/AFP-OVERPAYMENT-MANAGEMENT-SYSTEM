@@ -30,9 +30,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     authService.getUser()
       .then(setUser)
-      .catch(() => {
+      .catch((err) => {
         localStorage.removeItem('auth_token');
         setUser(null);
+        const message = err instanceof Error ? err.message : '';
+        if (message.toLowerCase().includes('expired') || message.toLowerCase().includes('session')) {
+          setError('Your session has expired. Please log in again.');
+        }
       })
       .finally(() => setIsLoading(false));
   }, []);

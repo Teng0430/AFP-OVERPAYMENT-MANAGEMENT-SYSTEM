@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { type AxiosResponse, type AxiosProgressEvent } from 'axios';
 
 const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8000/api',
@@ -16,16 +16,54 @@ apiClient.interceptors.request.use((config) => {
 });
 
 apiClient.interceptors.response.use(
-  (response) => {
+  (response: AxiosResponse) => {
     if (response.data?.success === true) {
       return response.data.data;
     }
     return Promise.reject(new Error(response.data?.error ?? 'Request failed'));
   },
   (error) => {
-    const message = error.response?.data?.error ?? error.message;
-    return Promise.reject(new Error(message));
+    if (!error.response) {
+      return Promise.reject(new Error('Unable to connect. Please check your internet connection and try again.'));
+    }
+    const status = error.response.status;
+    if (status === 401) {
+      return Promise.reject(new Error('Invalid username or password.'));
+    }
+    if (status === 403 || status === 423) {
+      return Promise.reject(new Error('Account locked. Please contact your administrator.'));
+    }
+    if (status >= 500) {
+      return Promise.reject(new Error('Service temporarily unavailable. Please try again later.'));
+    }
+    return Promise.reject(new Error(error.response.data?.error ?? 'An unexpected error occurred. Please try again.'));
   },
 );
+
+export function getDownloadUrl(path: string): string {
+  const base = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8000/api';
+  const token = localStorage.getItem('auth_token');
+  return `${base}${path}${path.includes('?') ? '&' : '?'}token=${token}`;
+}
+
+export async function uploadFile<T>(
+  url: string,
+  file: File,
+  onProgress?: (progress: number) => void,
+): Promise<T> {
+  const formData = new FormData();
+  formData.append('file', file);
+
+  const response = await apiClient.post(url, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+    onUploadProgress: (event: AxiosProgressEvent) => {
+      if (onProgress && event.total) {
+        onProgress(Math.round((event.loaded * 100) / event.total));
+      }
+    },
+  }) as T;
+
+  return response;
+}
 
 export default apiClient;
