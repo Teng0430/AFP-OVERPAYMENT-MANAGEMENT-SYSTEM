@@ -1,5 +1,5 @@
 import apiClient from './api';
-import type { Pensioner } from '../types';
+import type { Pensioner, AgencyDeduction } from '../types';
 import type { PaginationMeta } from '../types';
 
 export interface PensionerFilters {
@@ -26,6 +26,23 @@ export interface PensionerListResponse {
   meta: PaginationMeta;
 }
 
+export interface CreatePensionerPayload {
+  rank: string;
+  name: string;
+  serial_number: string;
+  account_number?: string;
+  date_of_death: string;
+  last_payment: string;
+  cause_of_stoppage: string;
+  agency_name: string;
+  monthly_pension: number;
+  agency_deduction?: number;
+  agency_deductions?: AgencyDeduction[];
+  amount_collected: number;
+  date_collected?: string;
+  status: string;
+}
+
 export async function list(filters?: PensionerFilters): Promise<PensionerListResponse> {
   const data = await apiClient.get('/pensioners', { params: filters }) as PensionerListResponse;
   return data;
@@ -36,13 +53,31 @@ export async function get(id: number): Promise<Pensioner> {
   return data.pensioner;
 }
 
-export async function create(payload: Partial<Pensioner>): Promise<Pensioner> {
-  const data = await apiClient.post('/pensioners', payload) as { pensioner: Pensioner };
+export async function create(payload: CreatePensionerPayload | Partial<Pensioner>): Promise<Pensioner> {
+  const normalized = { ...payload };
+
+  if (normalized.agency_deductions && normalized.agency_deductions.length > 0) {
+    normalized.agency_deductions = normalized.agency_deductions.map((d, i) => ({
+      ...d,
+      crediting_agency: i === 0,
+    }));
+  }
+
+  const data = await apiClient.post('/pensioners', normalized) as { pensioner: Pensioner };
   return data.pensioner;
 }
 
 export async function update(id: number, payload: Partial<Pensioner>): Promise<Pensioner> {
-  const data = await apiClient.put(`/pensioners/${id}`, payload) as { pensioner: Pensioner };
+  const normalized = { ...payload };
+
+  if (normalized.agency_deductions && normalized.agency_deductions.length > 0) {
+    normalized.agency_deductions = normalized.agency_deductions.map((d, i) => ({
+      ...d,
+      crediting_agency: i === 0,
+    }));
+  }
+
+  const data = await apiClient.put(`/pensioners/${id}`, normalized) as { pensioner: Pensioner };
   return data.pensioner;
 }
 

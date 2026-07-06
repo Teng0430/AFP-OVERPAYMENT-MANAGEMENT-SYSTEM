@@ -138,7 +138,7 @@ class ReportsController extends Controller
 
         $writer->addRow(Row::fromValues([
             'Name', 'Serial Number', 'Account Number', 'Rank', 'Agency',
-            'Monthly Pension', 'Agency Deduction', 'Fractional Days',
+            'Monthly Pension', 'Agency Deduction', 'Fractional Days in Month',
             'Whole Months', 'Amount Collected', 'Date Collected',
             'Date of Death', 'Cause of Stoppage', 'Status',
         ]));

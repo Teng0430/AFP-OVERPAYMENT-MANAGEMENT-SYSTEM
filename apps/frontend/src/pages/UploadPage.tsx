@@ -39,7 +39,7 @@ const SYSTEM_FIELDS = [
   { value: 'agency_name', label: 'Agency' },
   { value: 'monthly_pension', label: 'Monthly Pension' },
   { value: 'agency_deduction', label: 'Agency Deduction' },
-  { value: 'fractional_days', label: 'Fractional Days' },
+  { value: 'fractional_days', label: 'Fractional Days in Month' },
   { value: 'whole_months', label: 'Whole Months' },
   { value: 'amount_collected', label: 'Amount Collected' },
   { value: 'date_collected', label: 'Date Collected' },

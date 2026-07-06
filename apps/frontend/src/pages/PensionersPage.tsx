@@ -173,6 +173,14 @@ function PensionersPage() {
       { accessorKey: 'name', header: 'Name' },
       { accessorKey: 'serial_number', header: 'Serial #' },
       { accessorKey: 'agency_name', header: 'Agency' },
+      { accessorKey: 'last_payment', header: 'Last Payment' },
+      { accessorKey: 'agency_deductions', header: 'Deductions',
+        cell: ({ row }) => {
+          const deps = row.original.agency_deductions;
+          if (!deps || deps.length === 0) return '—';
+          return `${deps.length} deduction(s)`;
+        },
+      },
       {
         accessorKey: 'monthly_pension',
         header: 'Monthly Pension',
@@ -240,6 +248,11 @@ function PensionersPage() {
     manualPagination: true,
     pageCount: Math.ceil(total / perPage),
   });
+
+  function handleApplyFilters() {
+    setPage(1);
+    fetchPensioners();
+  }
 
   const lastPage = Math.ceil(total / perPage);
 

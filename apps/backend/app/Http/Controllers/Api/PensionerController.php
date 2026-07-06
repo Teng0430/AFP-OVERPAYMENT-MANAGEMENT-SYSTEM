@@ -7,6 +7,7 @@ use App\Http\Requests\StorePensionerRequest;
 use App\Http\Requests\UpdatePensionerRequest;
 use App\Http\Resources\PensionerResource;
 use App\Models\Pensioner;
+use App\Services\OverpaymentCalculationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -21,7 +22,7 @@ class PensionerController extends Controller
         'date_of_death', 'cause_of_stoppage', 'agency_name',
         'monthly_pension', 'agency_deduction', 'fractional_days',
         'whole_months', 'amount_collected', 'date_collected',
-        'status', 'created_at', 'updated_at',
+        'status', 'last_payment', 'created_at', 'updated_at',
     ];
 
     public function index(Request $request): AnonymousResourceCollection|JsonResponse
@@ -103,8 +104,12 @@ class PensionerController extends Controller
 
     public function store(StorePensionerRequest $request): JsonResponse
     {
+        $data = $request->validated();
+
+        $this->computeAndMergeOverpayment($data);
+
         $pensioner = Pensioner::create([
-            ...$request->validated(),
+            ...$data,
             'created_by' => $request->user()->id,
         ]);
 
@@ -116,7 +121,11 @@ class PensionerController extends Controller
     public function update(UpdatePensionerRequest $request, int $id): JsonResponse
     {
         $pensioner = Pensioner::findOrFail($id);
-        $pensioner->update($request->validated());
+        $data = $request->validated();
+
+        $this->computeAndMergeOverpayment($data);
+
+        $pensioner->update($data);
 
         $pensioner->load(['uploadBatch', 'creator']);
 
@@ -154,10 +163,12 @@ class PensionerController extends Controller
             'data.serial_number' => ['sometimes', 'string', 'max:50'],
             'data.account_number' => ['nullable', 'string', 'max:50'],
             'data.date_of_death' => ['nullable', 'date'],
+            'data.last_payment' => ['nullable', 'date'],
             'data.cause_of_stoppage' => ['sometimes', 'string', 'max:255'],
             'data.agency_name' => ['sometimes', 'string', 'max:50'],
             'data.monthly_pension' => ['sometimes', 'numeric', 'min:0'],
             'data.agency_deduction' => ['nullable', 'numeric', 'min:0'],
+            'data.agency_deductions' => ['nullable', 'array', 'max:10'],
             'data.fractional_days' => ['sometimes', 'numeric', 'min:0', 'max:31'],
             'data.whole_months' => ['sometimes', 'integer', 'min:0'],
             'data.amount_collected' => ['sometimes', 'numeric', 'min:0'],
@@ -169,5 +180,56 @@ class PensionerController extends Controller
             ->update($request->input('data'));
 
         return response()->success(['message' => 'Pensioners updated successfully.']);
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     */
+    private function computeAndMergeOverpayment(array &$data): void
+    {
+        $dateOfDeath = $data['date_of_death'] ?? null;
+        $lastPayment = $data['last_payment'] ?? null;
+        $monthlyPension = (float) ($data['monthly_pension'] ?? 0);
+
+        if ($dateOfDeath !== null && $lastPayment !== null && $monthlyPension > 0) {
+            $data['whole_months'] = OverpaymentCalculationService::wholeMonths($dateOfDeath, $lastPayment);
+            $data['fractional_days'] = OverpaymentCalculationService::fractionalDays($dateOfDeath, $lastPayment);
+        }
+
+        if (isset($data['agency_deduction']) && ! isset($data['agency_deductions'])) {
+            $data['agency_deductions'] = [
+                [
+                    'agency_name' => $data['agency_name'],
+                    'amount' => (float) $data['agency_deduction'],
+                    'crediting_agency' => true,
+                ],
+            ];
+        }
+
+        if (isset($data['agency_deductions'])) {
+            $firstCrediting = null;
+            foreach ($data['agency_deductions'] as $i => $entry) {
+                if (! empty($entry['crediting_agency'])) {
+                    $firstCrediting = $entry['agency_name'];
+                    break;
+                }
+            }
+
+            if ($firstCrediting === null && ! empty($data['agency_deductions'])) {
+                $data['agency_deductions'][0]['crediting_agency'] = true;
+                $firstCrediting = $data['agency_deductions'][0]['agency_name'];
+            }
+
+            $data['crediting_agency_name'] = $firstCrediting;
+
+            $data['agency_deductions'] = array_map(
+                fn (array $entry) => [
+                    'agency_name' => $entry['agency_name'],
+                    'amount' => (float) $entry['amount'],
+                    'crediting_agency' => (bool) ($entry['crediting_agency'] ?? false),
+                ],
+                $data['agency_deductions'],
+            );
+        }
     }
 }

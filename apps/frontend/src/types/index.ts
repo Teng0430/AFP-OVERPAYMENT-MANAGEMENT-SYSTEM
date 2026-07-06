@@ -176,50 +176,101 @@ export interface DashboardCharts {
   monthly_recoveries_heatmap: { year: number; month: number; amount: number }[];
 }
 
+// ── Agency Deduction ──
+export interface AgencyDeduction {
+  agency_name: string;
+  amount: number;
+  crediting_agency?: boolean;
+}
+
+// ── Multi-Component Overpayment Result ──
+export interface AgencyOverpaymentItem {
+  agency_name: string;
+  amount: number;
+  overpayment: number;
+}
+
+export interface MultiComponentResult {
+  netMonthlyPension: number;
+  netPensionOverpayment: number;
+  agencyOverpayments: AgencyOverpaymentItem[];
+  grandTotalOverpayment: number;
+}
+
 // ── Enums / Constants ──
 export const RANK_OPTIONS = [
-  { value: 'GEN', label: 'General' },
-  { value: 'LTG', label: 'Lieutenant General' },
-  { value: 'MG', label: 'Major General' },
-  { value: 'BGEN', label: 'Brigadier General' },
-  { value: 'COL', label: 'Colonel' },
-  { value: 'LTC', label: 'Lieutenant Colonel' },
-  { value: 'MAJ', label: 'Major' },
-  { value: 'CPT', label: 'Captain' },
-  { value: '1LT', label: 'First Lieutenant' },
-  { value: '2LT', label: 'Second Lieutenant' },
-  { value: 'ENS', label: 'Ensign' },
-  { value: 'LTJG', label: 'Lieutenant Junior Grade' },
-  { value: 'LT', label: 'Lieutenant' },
-  { value: 'LCDR', label: 'Lieutenant Commander' },
-  { value: 'CDR', label: 'Commander' },
-  { value: 'CAPT', label: 'Captain (Navy)' },
-  { value: 'CMS', label: 'Chief Master Sergeant' },
-  { value: 'MSG', label: 'Master Sergeant' },
-  { value: 'TSG', label: 'Technical Sergeant' },
-  { value: 'SSG', label: 'Staff Sergeant' },
-  { value: 'SGT', label: 'Sergeant' },
-  { value: 'CPL', label: 'Corporal' },
-  { value: 'PFC', label: 'Private First Class' },
-  { value: 'PVT', label: 'Private' },
+  { value: 'ADM', label: 'ADM' },
+  { value: 'VADM', label: 'VADM' },
+  { value: 'RADM', label: 'RADM' },
+  { value: 'COMO', label: 'COMO' },
+  { value: 'CAPT', label: 'CAPT' },
+  { value: 'CDR', label: 'CDR' },
+  { value: 'LCDR', label: 'LCDR' },
+  { value: 'LT', label: 'LT' },
+  { value: 'LTJG', label: 'LTJG' },
+  { value: 'ENS', label: 'ENS' },
+  { value: 'GEN', label: 'GEN' },
+  { value: 'LTGEN', label: 'LTGEN' },
+  { value: 'MGEN', label: 'MGEN' },
+  { value: 'BGEN', label: 'BGEN' },
+  { value: 'COL', label: 'COL' },
+  { value: 'LTC', label: 'LTC' },
+  { value: 'MAJ', label: 'MAJ' },
+  { value: 'CPT', label: 'CPT' },
+  { value: '1LT', label: '1LT' },
+  { value: '2LT', label: '2LT' },
+  { value: 'FOIC', label: 'FOIC' },
+  { value: 'MCPO', label: 'MCPO' },
+  { value: 'SCPO', label: 'SCPO' },
+  { value: 'CPO', label: 'CPO' },
+  { value: 'PO1', label: 'PO1' },
+  { value: 'PO2', label: 'PO2' },
+  { value: 'PO3', label: 'PO3' },
+  { value: 'SA', label: 'SA' },
+  { value: 'SN', label: 'SN' },
+  { value: 'SR', label: 'SR' },
+  { value: 'CMSG', label: 'CMSG' },
+  { value: 'SMSG', label: 'SMSG' },
+  { value: 'MSG', label: 'MSG' },
+  { value: 'TSG', label: 'TSG' },
+  { value: 'SSG', label: 'SSG' },
+  { value: 'SGT', label: 'SGT' },
+  { value: 'CPL', label: 'CPL' },
+  { value: 'PFC', label: 'PFC' },
+  { value: 'PVT', label: 'PVT' },
+  { value: 'OW', label: 'OW' },
+  { value: 'EW', label: 'EW' },
+  { value: 'MR', label: 'MR' },
+  { value: 'MS', label: 'MS' },
+  { value: 'MRS', label: 'MRS' },
+  { value: 'GDN', label: 'GDN' },
 ] as const;
 
 export const AGENCY_OPTIONS = [
-  { value: 'LBP', label: 'Land Bank of the Philippines (LBP)' },
-  { value: 'DBP', label: 'Development Bank of the Philippines (DBP)' },
-  { value: 'PVB', label: 'Philippine Veterans Bank (PVB)' },
-  { value: 'PNB', label: 'Philippine National Bank (PNB)' },
-  { value: 'BDO', label: 'BDO Unibank' },
-  { value: 'METROBANK', label: 'Metropolitan Bank & Trust Company' },
-  { value: 'BPI', label: 'Bank of the Philippine Islands (BPI)' },
-  { value: 'CHINABANK', label: 'China Banking Corporation' },
-  { value: 'UCPB', label: 'United Coconut Planters Bank' },
-  { value: 'PSBANK', label: 'Philippine Savings Bank' },
-  { value: 'EASTWEST', label: 'EastWest Bank' },
-  { value: 'SECURITY', label: 'Security Bank Corporation' },
-  { value: 'RCBC', label: 'Rizal Commercial Banking Corporation' },
-  { value: 'UNIONBANK', label: 'Union Bank of the Philippines' },
-  { value: 'OTHER', label: 'Other Bank/Institution' },
+  { value: 'LBP', label: 'LBP' },
+  { value: 'DBP', label: 'DBP' },
+  { value: 'PVB', label: 'PVB' },
+  { value: 'ACDI', label: 'ACDI' },
+  { value: 'ACES', label: 'ACES' },
+  { value: 'AFPFCMPC', label: 'AFPFCMPC' },
+  { value: 'AFPMBAI', label: 'AFPMBAI' },
+  { value: 'AFPSLAI', label: 'AFPSLAI' },
+  { value: 'AGFO', label: 'AGFO' },
+  { value: 'ALIP', label: 'ALIP' },
+  { value: 'AMWSLAI', label: 'AMWSLAI' },
+  { value: 'AVACC', label: 'AVACC' },
+  { value: 'BABSLAI', label: 'BABSLAI' },
+  { value: 'BOT B4 ACCT (101)', label: 'BOT B4 ACCT (101)' },
+  { value: 'CWSLA', label: 'CWSLA' },
+  { value: 'FABSLAI', label: 'FABSLAI' },
+  { value: 'KBKP', label: 'KBKP' },
+  { value: 'KKMPC', label: 'KKMPC' },
+  { value: 'PAFCPIC', label: 'PAFCPIC' },
+  { value: 'PNSLAI', label: 'PNSLAI' },
+  { value: 'PNRA-CCI', label: 'PNRA-CCI' },
+  { value: 'PVB EMER LOAN', label: 'PVB EMER LOAN' },
+  { value: 'RSBS 5% OF DIFFL', label: 'RSBS 5% OF DIFFL' },
+  { value: 'RSBS 5% OF REG RATE', label: 'RSBS 5% OF REG RATE' },
 ] as const;
 
 export const STATUS_OPTIONS = [

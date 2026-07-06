@@ -36,6 +36,17 @@ apiClient.interceptors.response.use(
     if (status >= 500) {
       return Promise.reject(new Error('Service temporarily unavailable. Please try again later.'));
     }
+    if (status === 422) {
+      const errorData = error.response.data?.error;
+      const message = typeof errorData === 'object' && errorData !== null
+        ? (errorData as { message?: string }).message ?? 'Validation failed.'
+        : errorData ?? 'Validation failed.';
+      const err = new Error(message);
+      (err as Record<string, unknown>).validationErrors = typeof errorData === 'object' && errorData !== null
+        ? (errorData as { details?: Record<string, string[]> }).details ?? {}
+        : {};
+      return Promise.reject(err);
+    }
     return Promise.reject(new Error(error.response.data?.error ?? 'An unexpected error occurred. Please try again.'));
   },
 );
