@@ -174,17 +174,18 @@ export function computeFullBreakdown(
   lastPayment: Date,
 ): FullBreakdownResult {
   const nonCreditingDeductions = agencyDeductions.filter((d) => !d.crediting_agency);
-  const totalDeductions = nonCreditingDeductions.reduce((sum, d) => sum + d.amount, 0);
+  const totalDeductions = nonCreditingDeductions.reduce((sum, d) => sum + Number(d.amount), 0);
   const totalNonCrediting = totalDeductions;
   const net = Math.max(0, grossMonthlyPension - totalDeductions);
 
   const netOp = computeComponentOverpayment(net, dateOfDeath, lastPayment);
 
   const agencyOps = agencyDeductions.map((d) => {
-    const op = computeComponentOverpayment(d.amount, dateOfDeath, lastPayment);
+    const amount = Number(d.amount);
+    const op = computeComponentOverpayment(amount, dateOfDeath, lastPayment);
     return {
       agency_name: d.agency_name,
-      amount: d.amount,
+      amount,
       overpayment: op.overpayment,
     };
   });

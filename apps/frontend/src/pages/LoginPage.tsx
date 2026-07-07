@@ -72,6 +72,7 @@ function LoginPage() {
                 >
                   <EnterpriseAlert
                     type={error.type}
+                    message={error.message}
                     onDismiss={() => setError(null)}
                   />
                 </motion.div>

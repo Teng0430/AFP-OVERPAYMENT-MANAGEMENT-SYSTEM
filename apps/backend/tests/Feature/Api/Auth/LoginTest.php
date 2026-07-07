@@ -25,7 +25,7 @@ test('registered user can login successfully', function (): void {
     expect($response->json('data.token'))->toBeString()->not->toBeEmpty();
 });
 
-test('invalid password returns 401 with generic error', function (): void {
+test('invalid password returns 401 with incorrect password message', function (): void {
     User::factory()->create([
         'email' => 'jane@example.com',
         'password' => bcrypt('password123'),
@@ -40,12 +40,12 @@ test('invalid password returns 401 with generic error', function (): void {
         ->assertJson([
             'success' => false,
             'error' => [
-                'message' => 'Invalid credentials.',
+                'message' => 'Incorrect password.',
             ],
         ]);
 });
 
-test('unregistered email returns 401 with generic error', function (): void {
+test('unregistered email returns 401 with user not found message', function (): void {
     $response = $this->postJson('/api/login', [
         'email' => 'nonexistent@example.com',
         'password' => 'password123',
@@ -55,7 +55,7 @@ test('unregistered email returns 401 with generic error', function (): void {
         ->assertJson([
             'success' => false,
             'error' => [
-                'message' => 'Invalid credentials.',
+                'message' => 'User not found.',
             ],
         ]);
 });

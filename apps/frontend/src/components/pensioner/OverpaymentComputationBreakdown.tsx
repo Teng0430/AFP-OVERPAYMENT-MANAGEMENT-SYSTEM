@@ -12,8 +12,6 @@ export function OverpaymentComputationBreakdown({
   grossPension,
   creditingAgencyName,
 }: OverpaymentComputationBreakdownProps) {
-  const totalAgencyOverpayments = breakdown.agencyOverpayments.reduce((s, a) => s + a.overpayment, 0);
-
   return (
     <div className="space-y-4">
       {/* A. Pension Summary */}
@@ -95,14 +93,6 @@ export function OverpaymentComputationBreakdown({
       <div className="rounded-lg border bg-primary/5 p-4">
         <h4 className="mb-3 text-sm font-semibold text-muted-foreground uppercase tracking-wide">Final Summary</h4>
         <div className="space-y-2 text-sm">
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">Net Pension Overpayment</span>
-            <span className="font-medium">{formatCurrency(breakdown.netPensionOverpayment)}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">Total Agency Overpayments</span>
-            <span className="font-medium">{formatCurrency(totalAgencyOverpayments)}</span>
-          </div>
           <div className="flex justify-between border-t pt-2 text-base font-bold">
             <span>Grand Total Overpayment</span>
             <span className="text-primary">{formatCurrency(breakdown.grandTotalOverpayment)}</span>

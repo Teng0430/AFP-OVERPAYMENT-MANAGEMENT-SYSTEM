@@ -9,6 +9,7 @@ use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
@@ -23,11 +24,27 @@ class AuthController extends Controller
 
     public function login(LoginRequest $request): JsonResponse
     {
-        $user = User::where('email', $request->input('email'))->first();
+        $email = $request->input('email');
+        Log::info('Login attempt', ['email' => $email]);
 
-        if (! $user || ! Hash::check($request->input('password'), $user->password)) {
-            return response()->error('Invalid credentials.', 'AUTHENTICATION_ERROR', 401);
+        $user = User::where('email', $email)->first();
+
+        if (! $user) {
+            Log::warning('Login failed: user not found', ['email' => $email]);
+            return response()->error('User not found.', 'AUTHENTICATION_ERROR', 401);
         }
+
+        if (! Hash::check($request->input('password'), $user->password)) {
+            Log::warning('Login failed: incorrect password', ['email' => $email]);
+            return response()->error('Incorrect password.', 'AUTHENTICATION_ERROR', 401);
+        }
+
+        if (! $user->is_active) {
+            Log::warning('Login failed: account inactive', ['email' => $email]);
+            return response()->error('Account inactive.', 'AUTHENTICATION_ERROR', 401);
+        }
+
+        Log::info('Login successful', ['email' => $email, 'user_id' => $user->id]);
 
         $token = $user->createToken('auth-token')->plainTextToken;
 

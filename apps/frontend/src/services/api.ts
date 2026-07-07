@@ -37,9 +37,6 @@ apiClient.interceptors.response.use(
       return Promise.reject(new Error('Unable to connect. Please check your internet connection and try again.'));
     }
     const status = error.response.status;
-    if (status === 401) {
-      return Promise.reject(new Error('Invalid username or password.'));
-    }
     if (status === 403 || status === 423) {
       return Promise.reject(new Error('Account locked. Please contact your administrator.'));
     }
@@ -57,7 +54,11 @@ apiClient.interceptors.response.use(
         : {};
       return Promise.reject(err);
     }
-    return Promise.reject(new Error(error.response.data?.error ?? 'An unexpected error occurred. Please try again.'));
+    const errorBody = error.response.data?.error;
+    const errorMessage = typeof errorBody === 'object' && errorBody !== null
+      ? (errorBody as { message?: string }).message ?? 'An unexpected error occurred. Please try again.'
+      : errorBody ?? 'An unexpected error occurred. Please try again.';
+    return Promise.reject(new Error(errorMessage));
   },
 );
 

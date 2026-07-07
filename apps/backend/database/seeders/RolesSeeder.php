@@ -7,47 +7,14 @@ use Illuminate\Database\Seeder;
 
 class RolesSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
-    public function run(): void
-    {
-        Role::create([
-            'name' => 'Super Admin',
-            'slug' => 'super-admin',
+    private const ROLES = [
+        [
+            'name' => 'Administrator',
+            'slug' => 'administrator',
             'description' => 'Full system access with all permissions.',
             'permissions' => ['*'],
-        ]);
-
-        Role::create([
-            'name' => 'Finance Admin',
-            'slug' => 'finance-admin',
-            'description' => 'Administrative access to finance-related features.',
-            'permissions' => [
-                'pensioner.*',
-                'upload.*',
-                'recovery.*',
-                'report.*',
-                'alert.*',
-                'user.read',
-                'setting.*',
-            ],
-        ]);
-
-        Role::create([
-            'name' => 'Finance Officer',
-            'slug' => 'finance-officer',
-            'description' => 'Operational access to finance features.',
-            'permissions' => [
-                'pensioner.*',
-                'upload.*',
-                'recovery.*',
-                'report.*',
-                'alert.read',
-            ],
-        ]);
-
-        Role::create([
+        ],
+        [
             'name' => 'Encoder',
             'slug' => 'encoder',
             'description' => 'Can create and update pensioner records.',
@@ -56,29 +23,38 @@ class RolesSeeder extends Seeder
                 'pensioner.read',
                 'pensioner.update',
             ],
-        ]);
-
-        Role::create([
-            'name' => 'Viewer',
-            'slug' => 'viewer',
-            'description' => 'Read-only access to pensioner data, reports, and alerts.',
+        ],
+        [
+            'name' => 'Reviewer',
+            'slug' => 'reviewer',
+            'description' => 'Can review and approve pensioner records.',
+            'permissions' => [
+                'pensioner.read',
+                'pensioner.update',
+                'report.read',
+            ],
+        ],
+        [
+            'name' => 'Approver',
+            'slug' => 'approver',
+            'description' => 'Can approve final decisions on pensioner records.',
             'permissions' => [
                 'pensioner.read',
                 'report.read',
                 'alert.read',
             ],
-        ]);
+        ],
+    ];
 
-        Role::create([
-            'name' => 'Auditor',
-            'slug' => 'auditor',
-            'description' => 'Read-only access plus audit log review.',
-            'permissions' => [
-                'pensioner.read',
-                'report.read',
-                'alert.read',
-                'audit-log.*',
-            ],
-        ]);
+    /**
+     * Run the database seeds.
+     */
+    public function run(): void
+    {
+        foreach (self::ROLES as $role) {
+            if (! Role::where('slug', $role['slug'])->exists()) {
+                Role::create($role);
+            }
+        }
     }
 }

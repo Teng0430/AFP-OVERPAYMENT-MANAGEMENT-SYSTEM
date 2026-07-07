@@ -6,6 +6,7 @@ export type ErrorType = 'invalid-credentials' | 'network-error' | 'server-unavai
 
 interface EnterpriseAlertProps {
   type: ErrorType;
+  message?: string;
   onDismiss?: () => void;
   className?: string;
 }
@@ -43,7 +44,7 @@ const alertConfig: Record<ErrorType, { icon: typeof AlertCircle; title: string; 
   },
 };
 
-function EnterpriseAlert({ type, onDismiss, className }: EnterpriseAlertProps) {
+function EnterpriseAlert({ type, message, onDismiss, className }: EnterpriseAlertProps) {
   const config = alertConfig[type];
   const Icon = config.icon;
 
@@ -72,7 +73,7 @@ function EnterpriseAlert({ type, onDismiss, className }: EnterpriseAlertProps) {
       <Icon className={cn('mt-0.5 h-5 w-5 shrink-0', iconColors[config.variant])} aria-hidden="true" />
       <div className="flex-1 min-w-0">
         <p className="text-sm font-semibold">{config.title}</p>
-        <p className="mt-1 text-xs opacity-90">{config.message}</p>
+        <p className="mt-1 text-xs opacity-90">{message ?? config.message}</p>
       </div>
       {onDismiss && (
         <button
