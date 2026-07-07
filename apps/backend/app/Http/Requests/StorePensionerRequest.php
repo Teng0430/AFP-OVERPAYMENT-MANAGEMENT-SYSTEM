@@ -48,12 +48,16 @@ class StorePensionerRequest extends FormRequest
                 $data = $validator->getData();
                 $gross = (float) ($data['monthly_pension'] ?? 0);
                 $deductions = $data['agency_deductions'] ?? [];
-                $total = array_sum(array_column($deductions, 'amount'));
+                $nonCrediting = array_filter(
+                    $deductions,
+                    fn (array $d) => empty($d['crediting_agency']),
+                );
+                $total = array_sum(array_column($nonCrediting, 'amount'));
 
                 if ($gross > 0 && ($gross - $total) < 0) {
                     $validator->errors()->add(
                         'agency_deductions',
-                        'Total deductions cannot exceed the monthly pension.',
+                        'Total non-crediting agency deductions cannot exceed the monthly pension.',
                     );
                 }
             },

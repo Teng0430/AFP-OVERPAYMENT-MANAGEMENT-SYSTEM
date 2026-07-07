@@ -135,11 +135,15 @@ class OverpaymentCalculationService
     }
 
     /**
-     * @param  array<int, array{agency_name: string, amount: float}>  $deductions
+     * @param  array<int, array{agency_name: string, amount: float, crediting_agency?: bool}>  $deductions
      */
     public static function netMonthlyPension(float $gross, array $deductions): float
     {
-        $totalDeductions = array_sum(array_column($deductions, 'amount'));
+        $nonCrediting = array_filter(
+            $deductions,
+            fn (array $d) => empty($d['crediting_agency']),
+        );
+        $totalDeductions = array_sum(array_column($nonCrediting, 'amount'));
 
         return round(max(0, $gross - $totalDeductions), 2);
     }

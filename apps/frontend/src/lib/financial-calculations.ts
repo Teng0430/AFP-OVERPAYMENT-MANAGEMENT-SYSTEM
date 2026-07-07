@@ -135,6 +135,7 @@ export interface AgencyOverpaymentEntry {
 
 export interface FullBreakdownResult {
   netMonthlyPension: number;
+  totalNonCrediting: number;
   netPensionOverpayment: number;
   agencyOverpayments: AgencyOverpaymentEntry[];
   grandTotalOverpayment: number;
@@ -172,7 +173,9 @@ export function computeFullBreakdown(
   dateOfDeath: Date,
   lastPayment: Date,
 ): FullBreakdownResult {
-  const totalDeductions = agencyDeductions.reduce((sum, d) => sum + d.amount, 0);
+  const nonCreditingDeductions = agencyDeductions.filter((d) => !d.crediting_agency);
+  const totalDeductions = nonCreditingDeductions.reduce((sum, d) => sum + d.amount, 0);
+  const totalNonCrediting = totalDeductions;
   const net = Math.max(0, grossMonthlyPension - totalDeductions);
 
   const netOp = computeComponentOverpayment(net, dateOfDeath, lastPayment);
@@ -191,6 +194,7 @@ export function computeFullBreakdown(
 
   return {
     netMonthlyPension: Math.round(net * 100) / 100,
+    totalNonCrediting: Math.round(totalNonCrediting * 100) / 100,
     netPensionOverpayment: netOp.overpayment,
     agencyOverpayments: agencyOps,
     grandTotalOverpayment: grandTotal,

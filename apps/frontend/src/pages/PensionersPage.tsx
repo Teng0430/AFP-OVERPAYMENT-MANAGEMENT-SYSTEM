@@ -174,11 +174,11 @@ function PensionersPage() {
       { accessorKey: 'serial_number', header: 'Serial #' },
       { accessorKey: 'agency_name', header: 'Agency' },
       { accessorKey: 'last_payment', header: 'Last Payment' },
-      { accessorKey: 'agency_deductions', header: 'Deductions',
+      { accessorKey: 'agency_deductions', header: 'Agencies',
         cell: ({ row }) => {
           const deps = row.original.agency_deductions;
           if (!deps || deps.length === 0) return '—';
-          return `${deps.length} deduction(s)`;
+          return `${deps.length} agency(ies)`;
         },
       },
       {

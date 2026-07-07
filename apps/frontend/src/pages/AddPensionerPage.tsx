@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useForm, FormProvider } from 'react-hook-form';
+import { useForm, FormProvider, type Resolver } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { ArrowLeft } from 'lucide-react';
@@ -68,7 +68,7 @@ function AddPensionerPage() {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
 
   const form = useForm<PensionerFormData>({
-    resolver: zodResolver(pensionerSchema),
+    resolver: zodResolver(pensionerSchema) as Resolver<PensionerFormData>,
     defaultValues: {
       rank: '',
       name: '',
@@ -92,8 +92,9 @@ function AddPensionerPage() {
   const watchedDeductions = form.watch('agency_deductions');
 
   const creditingAgencyName = useMemo(() => {
-    if (watchedDeductions && watchedDeductions.length > 0 && watchedDeductions[0].agency_name) {
-      return watchedDeductions[0].agency_name;
+    const first = watchedDeductions?.[0];
+    if (first?.agency_name) {
+      return first.agency_name;
     }
     return null;
   }, [watchedDeductions]);
@@ -131,8 +132,9 @@ function AddPensionerPage() {
         agency_deductions: validDeductions,
       };
 
-      if (validDeductions.length > 0) {
-        payload.crediting_agency_name = validDeductions[0].agency_name;
+      const firstValid = validDeductions[0];
+      if (firstValid) {
+        payload.crediting_agency_name = firstValid.agency_name;
       }
 
       await create(payload);
@@ -190,7 +192,6 @@ function AddPensionerPage() {
                   <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                       <FormField
-                        control={form.control}
                         name="rank"
                         render={({ field }) => (
                           <FormItem>
@@ -210,7 +211,6 @@ function AddPensionerPage() {
                         )}
                       />
                       <FormField
-                        control={form.control}
                         name="name"
                         render={({ field }) => (
                           <FormItem>
@@ -221,7 +221,6 @@ function AddPensionerPage() {
                         )}
                       />
                       <FormField
-                        control={form.control}
                         name="serial_number"
                         render={({ field }) => (
                           <FormItem>
@@ -232,7 +231,6 @@ function AddPensionerPage() {
                         )}
                       />
                       <FormField
-                        control={form.control}
                         name="account_number"
                         render={({ field }) => (
                           <FormItem>
@@ -243,7 +241,6 @@ function AddPensionerPage() {
                         )}
                       />
                       <FormField
-                        control={form.control}
                         name="agency_name"
                         render={({ field }) => (
                           <FormItem>
@@ -263,7 +260,6 @@ function AddPensionerPage() {
                         )}
                       />
                       <FormField
-                        control={form.control}
                         name="cause_of_stoppage"
                         render={({ field }) => (
                           <FormItem>
@@ -274,7 +270,6 @@ function AddPensionerPage() {
                         )}
                       />
                       <FormField
-                        control={form.control}
                         name="monthly_pension"
                         render={({ field }) => (
                           <FormItem>
@@ -285,7 +280,6 @@ function AddPensionerPage() {
                         )}
                       />
                       <FormField
-                        control={form.control}
                         name="date_of_death"
                         render={({ field }) => (
                           <FormItem>
@@ -296,7 +290,6 @@ function AddPensionerPage() {
                         )}
                       />
                       <FormField
-                        control={form.control}
                         name="last_payment"
                         render={({ field }) => (
                           <FormItem>
@@ -307,7 +300,6 @@ function AddPensionerPage() {
                         )}
                       />
                       <FormField
-                        control={form.control}
                         name="amount_collected"
                         render={({ field }) => (
                           <FormItem>
@@ -318,7 +310,6 @@ function AddPensionerPage() {
                         )}
                       />
                       <FormField
-                        control={form.control}
                         name="date_collected"
                         render={({ field }) => (
                           <FormItem>
@@ -329,7 +320,6 @@ function AddPensionerPage() {
                         )}
                       />
                       <FormField
-                        control={form.control}
                         name="status"
                         render={({ field }) => (
                           <FormItem>

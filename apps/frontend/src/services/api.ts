@@ -5,6 +5,7 @@ const apiClient = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  timeout: 30000,
 });
 
 apiClient.interceptors.request.use((config) => {
@@ -24,6 +25,15 @@ apiClient.interceptors.response.use(
   },
   (error) => {
     if (!error.response) {
+      if (error.code === 'ECONNABORTED') {
+        return Promise.reject(new Error('Request timed out. Please check your network connection and try again.'));
+      }
+      const msg = (error.message ?? '').toLowerCase();
+      if (msg.includes('cors') || msg.includes('access-control-allow-origin')) {
+        return Promise.reject(
+          new Error('Connection refused by server. Please check that the API server is running and CORS is configured correctly.'),
+        );
+      }
       return Promise.reject(new Error('Unable to connect. Please check your internet connection and try again.'));
     }
     const status = error.response.status;
@@ -42,7 +52,7 @@ apiClient.interceptors.response.use(
         ? (errorData as { message?: string }).message ?? 'Validation failed.'
         : errorData ?? 'Validation failed.';
       const err = new Error(message);
-      (err as Record<string, unknown>).validationErrors = typeof errorData === 'object' && errorData !== null
+      (err as unknown as Record<string, unknown>).validationErrors = typeof errorData === 'object' && errorData !== null
         ? (errorData as { details?: Record<string, string[]> }).details ?? {}
         : {};
       return Promise.reject(err);

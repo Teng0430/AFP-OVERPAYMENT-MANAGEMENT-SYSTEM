@@ -38,6 +38,15 @@ class PensionerResource extends JsonResource
             'overpayment_amount' => $this->overpayment_amount,
             'crediting_agency_name' => $this->crediting_agency_name,
             'net_monthly_pension' => $this->net_monthly_pension,
+            'total_non_crediting' => (function () {
+                $deductions = $this->agency_deductions ?? [];
+                $nonCrediting = array_filter(
+                    $deductions,
+                    fn (array $d) => empty($d['crediting_agency']),
+                );
+
+                return round(array_sum(array_column($nonCrediting, 'amount')), 2);
+            })(),
             'net_pension_overpayment' => $this->net_pension_overpayment,
             'agency_overpayments' => $this->agency_overpayments,
             'grand_total_overpayment' => $this->grand_total_overpayment,
