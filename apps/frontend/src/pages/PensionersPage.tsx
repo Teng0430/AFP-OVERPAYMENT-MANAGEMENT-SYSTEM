@@ -88,8 +88,8 @@ function PensionersPage() {
       const data = await list(filters);
       setPensioners(data.pensioners);
       setTotal(data.meta.total);
-    } catch {
-      setError('Failed to load pensioners.');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load pensioners.');
     } finally {
       setLoading(false);
     }
@@ -110,8 +110,8 @@ function PensionersPage() {
     try {
       await remove(id);
       fetchPensioners();
-    } catch {
-      setError('Failed to delete pensioner.');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to delete pensioner.');
     }
   }
 
@@ -122,8 +122,8 @@ function PensionersPage() {
       await bulkDelete(selectedIds);
       setRowSelection({});
       fetchPensioners();
-    } catch {
-      setError('Failed to delete pensioners.');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to delete pensioners.');
     }
   }
 
@@ -133,8 +133,8 @@ function PensionersPage() {
       await bulkUpdate(selectedIds, { status: status as Pensioner['status'] });
       setRowSelection({});
       fetchPensioners();
-    } catch {
-      setError('Failed to update status.');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to update status.');
     }
   }
 
@@ -239,6 +239,7 @@ function PensionersPage() {
   const table = useReactTable({
     data: pensioners,
     columns,
+    getRowId: (row) => String(row.id),
     state: { sorting, rowSelection },
     onSortingChange: setSorting,
     onRowSelectionChange: setRowSelection,

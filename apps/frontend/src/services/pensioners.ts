@@ -44,8 +44,8 @@ export interface CreatePensionerPayload {
 }
 
 export async function list(filters?: PensionerFilters): Promise<PensionerListResponse> {
-  const data = await apiClient.get('/pensioners', { params: filters }) as PensionerListResponse;
-  return data;
+  const result = await apiClient.get('/pensioners', { params: filters }) as { data: Pensioner[]; meta: PaginationMeta };
+  return { pensioners: result.data, meta: result.meta };
 }
 
 export async function get(id: number): Promise<Pensioner> {

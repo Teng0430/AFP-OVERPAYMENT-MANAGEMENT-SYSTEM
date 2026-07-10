@@ -18,6 +18,9 @@ apiClient.interceptors.request.use((config) => {
 
 apiClient.interceptors.response.use(
   (response: AxiosResponse) => {
+    if (response.config.responseType === 'blob') {
+      return response;
+    }
     if (response.data?.success === true) {
       return response.data.data;
     }

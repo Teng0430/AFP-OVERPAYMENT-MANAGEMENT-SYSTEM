@@ -8,6 +8,7 @@ use App\Http\Requests\UpdatePensionerRequest;
 use App\Http\Resources\PensionerResource;
 use App\Models\Pensioner;
 use App\Services\OverpaymentCalculationService;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -25,7 +26,7 @@ class PensionerController extends Controller
         'status', 'last_payment', 'created_at', 'updated_at',
     ];
 
-    public function index(Request $request): AnonymousResourceCollection|JsonResponse
+    public function index(Request $request): JsonResponse
     {
         $query = Pensioner::query();
 
@@ -89,9 +90,12 @@ class PensionerController extends Controller
 
         $query->orderBy($sortBy, $sortDir);
 
-        $pensioners = $query->paginate(50);
+        $perPage = min((int) $request->input('per_page', 50), 100);
+        $pensioners = $query->paginate($perPage);
 
-        return PensionerResource::collection($pensioners);
+        $collection = PensionerResource::collection($pensioners);
+
+        return response()->success($collection->toResponse($request)->getData(true));
     }
 
     public function show(int $id): JsonResponse
@@ -134,22 +138,39 @@ class PensionerController extends Controller
 
     public function destroy(int $id): JsonResponse
     {
-        $pensioner = Pensioner::findOrFail($id);
-        $pensioner->delete();
+        try {
+            $pensioner = Pensioner::findOrFail($id);
+            $pensioner->delete();
 
-        return response()->success(['message' => 'Pensioner deleted successfully.']);
+            return response()->success(['message' => 'Pensioner deleted successfully.']);
+        } catch (QueryException $e) {
+            return response()->error(
+                'Unable to delete pensioner because related records exist.',
+                'FOREIGN_KEY_CONSTRAINT',
+                409,
+            );
+        }
     }
 
     public function bulkDelete(Request $request): JsonResponse
     {
         $request->validate([
-            'ids' => ['required', 'array'],
+            'ids' => ['required', 'array', 'min:1'],
             'ids.*' => ['required', 'integer', 'exists:pensioners,id'],
         ]);
 
-        Pensioner::whereIn('id', $request->input('ids'))->delete();
+        try {
+            $ids = $request->input('ids');
+            $deleted = Pensioner::whereIn('id', $ids)->delete();
 
-        return response()->success(['message' => 'Pensioners deleted successfully.']);
+            return response()->success(['message' => "{$deleted} pensioner(s) deleted successfully."]);
+        } catch (QueryException $e) {
+            return response()->error(
+                'Unable to delete pensioners because related records exist.',
+                'FOREIGN_KEY_CONSTRAINT',
+                409,
+            );
+        }
     }
 
     public function bulkUpdate(Request $request): JsonResponse

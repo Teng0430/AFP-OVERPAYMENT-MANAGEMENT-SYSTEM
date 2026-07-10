@@ -1,4 +1,5 @@
 import apiClient, { getDownloadUrl } from './api';
+import type { AxiosResponse } from 'axios';
 
 export interface ReportParams {
   type: 'daily' | 'weekly' | 'monthly' | 'quarterly' | 'annual' | 'custom';
@@ -9,12 +10,12 @@ export interface ReportParams {
 }
 
 export async function generate(params: ReportParams): Promise<Blob> {
-  const response = await apiClient.get('/reports/generate', {
+  const response = await apiClient.get('/reports/export', {
     params,
     responseType: 'blob',
-  });
+  }) as AxiosResponse;
 
-  return response as unknown as Blob;
+  return response.data as Blob;
 }
 
 export function getGenerateUrl(params: ReportParams): string {
@@ -24,5 +25,5 @@ export function getGenerateUrl(params: ReportParams): string {
       query.append(key, String(value));
     }
   });
-  return getDownloadUrl(`/reports/generate?${query.toString()}`);
+  return getDownloadUrl(`/reports/export?${query.toString()}`);
 }
