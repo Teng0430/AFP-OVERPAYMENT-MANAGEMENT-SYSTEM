@@ -212,3 +212,10 @@ export function formatDate(d: Date): string {
   const year = d.getUTCFullYear();
   return `${day}-${month}-${year}`;
 }
+
+export function formatDisplayDate(dateString: string | null | undefined): string {
+  if (!dateString) return 'N/A';
+  const d = new Date(dateString);
+  if (isNaN(d.getTime())) return 'N/A';
+  return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+}

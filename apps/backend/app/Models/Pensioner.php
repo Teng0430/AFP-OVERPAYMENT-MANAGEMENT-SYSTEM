@@ -174,9 +174,7 @@ class Pensioner extends Model
 
     public function getOverpaymentTotalAttribute(): float
     {
-        return (float) static::where('name', $this->name)
-            ->get()
-            ->sum(fn (self $p) => $p->overpayment_subtotal);
+        return (float) $this->overpayment_subtotal;
     }
 
     public function getBalanceAttribute(): float

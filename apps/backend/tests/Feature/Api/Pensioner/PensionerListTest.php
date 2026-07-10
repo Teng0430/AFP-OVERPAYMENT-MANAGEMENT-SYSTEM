@@ -61,6 +61,40 @@ it('returns empty list when no pensioners exist', function (): void {
     expect($body['data']['meta']['total'])->toBe(0);
 });
 
+it('list response shows correct overpayment_total for each pensioner', function (): void {
+    Pensioner::factory()->create(['monthly_pension' => 30000, 'whole_months' => 2, 'fractional_days' => 0]);
+    Pensioner::factory()->create(['monthly_pension' => 50000, 'whole_months' => 3, 'fractional_days' => 0]);
+
+    $response = $this->getJson('/api/pensioners');
+    $response->assertStatus(200);
+
+    $pensioners = $response->json('data.data');
+    foreach ($pensioners as $p) {
+        $model = Pensioner::find($p['id']);
+        expect($model)->not->toBeNull();
+        expect((float) $p['overpayment_total'])->toBe($model->overpayment_subtotal);
+    }
+});
+
+it('list response shows correct balance for each pensioner', function (): void {
+    Pensioner::factory()->create([
+        'monthly_pension' => 30000,
+        'whole_months' => 2,
+        'fractional_days' => 0,
+        'amount_collected' => 5000,
+    ]);
+
+    $response = $this->getJson('/api/pensioners');
+    $response->assertStatus(200);
+
+    $pensioners = $response->json('data.data');
+    foreach ($pensioners as $p) {
+        $model = Pensioner::find($p['id']);
+        expect($model)->not->toBeNull();
+        expect((float) $p['balance'])->toBe($model->overpayment_total - $model->amount_collected);
+    }
+});
+
 it('filters pensioners by status', function (): void {
     Pensioner::factory()->create(['status' => 'recovered']);
     Pensioner::factory()->create(['status' => 'not-yet-recovered']);

@@ -1,7 +1,7 @@
 <!-- SPECKIT START -->
 For additional context about technologies to be used, project structure,
 shell commands, and other important information, read the current plan
-at specs/011-fix-add-user/plan.md
+at specs/015-pensioners-list-ui/plan.md
 <!-- SPECKIT END -->
 
 ## Completed Features

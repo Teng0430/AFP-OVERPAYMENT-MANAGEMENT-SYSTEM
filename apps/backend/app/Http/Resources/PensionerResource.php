@@ -24,6 +24,9 @@ class PensionerResource extends JsonResource
             'account_number' => $this->account_number,
             'date_of_death' => $this->date_of_death,
             'last_payment' => $this->last_payment,
+            'last_payment_formatted' => $this->last_payment
+                ? \Carbon\Carbon::parse($this->last_payment)->format('F d, Y')
+                : null,
             'cause_of_stoppage' => $this->cause_of_stoppage,
             'agency_name' => $this->agency_name,
             'monthly_pension' => (float) $this->monthly_pension,
