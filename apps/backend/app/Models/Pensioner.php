@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Services\OverpaymentCalculationService;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -36,6 +37,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class Pensioner extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'rank',
         'name',
@@ -184,9 +187,7 @@ class Pensioner extends Model
 
     public function getOverpaymentTotalAttribute(): float
     {
-        return (float) static::where('name', $this->name)
-            ->get()
-            ->sum(fn (self $p) => $p->overpayment_subtotal);
+        return (float) $this->overpayment_subtotal;
     }
 
     public function getBalanceAttribute(): float

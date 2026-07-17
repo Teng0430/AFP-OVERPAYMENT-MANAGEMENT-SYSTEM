@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import { useState, useMemo, useCallback, useEffect } from 'react';
+=======
+import { useEffect, useState, useMemo, useCallback } from 'react';
+>>>>>>> 885f6e46fde5ccc3d66d67570c482cdded90d7da
 import { useNavigate, useParams } from 'react-router-dom';
 import { useForm, FormProvider, type Resolver } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -30,10 +34,17 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+<<<<<<< HEAD
 import { AgencyDeductionRepeater } from '@/components/pensioner/AgencyDeductionRepeater';
 import { OverpaymentComputationBreakdown } from '@/components/pensioner/OverpaymentComputationBreakdown';
 import { computeFullBreakdown } from '@/lib/financial-calculations';
 import type { Pensioner } from '@/types';
+=======
+import { Skeleton } from '@/components/ui/skeleton';
+import { AgencyDeductionRepeater } from '@/components/pensioner/AgencyDeductionRepeater';
+import { OverpaymentComputationBreakdown } from '@/components/pensioner/OverpaymentComputationBreakdown';
+import { computeFullBreakdown } from '@/lib/financial-calculations';
+>>>>>>> 885f6e46fde5ccc3d66d67570c482cdded90d7da
 
 const pensionerSchema = z.object({
   rank: z.string().min(1, 'Rank is required'),
@@ -65,11 +76,19 @@ type PensionerFormData = z.infer<typeof pensionerSchema>;
 function EditPensionerPage() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
+<<<<<<< HEAD
   const [submitting, setSubmitting] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
   const [pensioner, setPensioner] = useState<Pensioner | null>(null);
+=======
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [fetchError, setFetchError] = useState('');
+  const [error, setError] = useState('');
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
+>>>>>>> 885f6e46fde5ccc3d66d67570c482cdded90d7da
 
   const form = useForm<PensionerFormData>({
     resolver: zodResolver(pensionerSchema) as Resolver<PensionerFormData>,
@@ -91,6 +110,7 @@ function EditPensionerPage() {
   });
 
   useEffect(() => {
+<<<<<<< HEAD
     async function loadPensioner() {
       if (!id) return;
       try {
@@ -121,6 +141,36 @@ function EditPensionerPage() {
       }
     }
     loadPensioner();
+=======
+    if (!id) return;
+    const numId = Number(id);
+    if (isNaN(numId)) {
+      setFetchError('Invalid pensioner ID.');
+      setLoading(false);
+      return;
+    }
+
+    get(numId)
+      .then((p) => {
+        form.reset({
+          rank: p.rank ?? '',
+          name: p.name ?? '',
+          serial_number: p.serial_number ?? '',
+          account_number: p.account_number ?? '',
+          date_of_death: p.date_of_death ? p.date_of_death.split('T')[0] : '',
+          last_payment: p.last_payment ? p.last_payment.split('T')[0] : '',
+          cause_of_stoppage: p.cause_of_stoppage ?? '',
+          agency_name: p.agency_name ?? '',
+          monthly_pension: p.monthly_pension,
+          agency_deductions: p.agency_deductions?.length ? p.agency_deductions : [{ agency_name: '', amount: 0 }],
+          amount_collected: p.amount_collected ?? 0,
+          date_collected: p.date_collected ? p.date_collected.split('T')[0] : '',
+          status: p.status ?? '',
+        });
+      })
+      .catch((err) => setFetchError(err instanceof Error ? err.message : 'Failed to load pensioner.'))
+      .finally(() => setLoading(false));
+>>>>>>> 885f6e46fde5ccc3d66d67570c482cdded90d7da
   }, [id, form]);
 
   const watchedDoD = form.watch('date_of_death');
@@ -130,9 +180,13 @@ function EditPensionerPage() {
 
   const creditingAgencyName = useMemo(() => {
     const first = watchedDeductions?.[0];
+<<<<<<< HEAD
     if (first?.agency_name) {
       return first.agency_name;
     }
+=======
+    if (first?.agency_name) return first.agency_name;
+>>>>>>> 885f6e46fde5ccc3d66d67570c482cdded90d7da
     return null;
   }, [watchedDeductions]);
 
@@ -143,12 +197,16 @@ function EditPensionerPage() {
       if (!isNaN(dod.getTime()) && !isNaN(lp.getTime())) {
         try {
           const deductions = (watchedDeductions ?? []).filter((d) => d.agency_name !== '');
+<<<<<<< HEAD
           return computeFullBreakdown(
             watchedMP,
             deductions,
             dod,
             lp,
           );
+=======
+          return computeFullBreakdown(watchedMP, deductions, dod, lp);
+>>>>>>> 885f6e46fde5ccc3d66d67570c482cdded90d7da
         } catch {
           return null;
         }
@@ -202,11 +260,27 @@ function EditPensionerPage() {
             <p className="text-sm text-muted-foreground">Loading pensioner data...</p>
           </div>
         </div>
+<<<<<<< HEAD
+=======
+        <Card>
+          <CardContent className="p-6">
+            <div className="space-y-4">
+              {Array.from({ length: 10 }).map((_, i) => (
+                <Skeleton key={i} className="h-10 w-full" />
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+>>>>>>> 885f6e46fde5ccc3d66d67570c482cdded90d7da
       </div>
     );
   }
 
+<<<<<<< HEAD
   if (!pensioner) {
+=======
+  if (fetchError) {
+>>>>>>> 885f6e46fde5ccc3d66d67570c482cdded90d7da
     return (
       <div className="space-y-6">
         <div className="flex items-center gap-4">
@@ -215,9 +289,16 @@ function EditPensionerPage() {
           </Button>
           <div>
             <h1 className="text-2xl font-bold tracking-tight">Edit Pensioner</h1>
+<<<<<<< HEAD
             <p className="text-sm text-destructive">Pensioner not found.</p>
           </div>
         </div>
+=======
+          </div>
+        </div>
+        <div className="rounded-lg bg-destructive/10 p-4 text-sm text-destructive">{fetchError}</div>
+        <Button variant="outline" onClick={() => navigate('/pensioners')}>Back to List</Button>
+>>>>>>> 885f6e46fde5ccc3d66d67570c482cdded90d7da
       </div>
     );
   }
@@ -230,7 +311,11 @@ function EditPensionerPage() {
         </Button>
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Edit Pensioner</h1>
+<<<<<<< HEAD
           <p className="text-sm text-muted-foreground">Update overpayment record for {pensioner.name}.</p>
+=======
+          <p className="text-sm text-muted-foreground">Update overpayment record.</p>
+>>>>>>> 885f6e46fde5ccc3d66d67570c482cdded90d7da
         </div>
       </div>
 
@@ -414,7 +499,11 @@ function EditPensionerPage() {
 
                     <div className="flex items-center gap-3">
                       <Button type="submit" disabled={submitting}>
+<<<<<<< HEAD
                         {submitting ? 'Saving...' : 'Update Pensioner'}
+=======
+                        {submitting ? 'Saving...' : 'Save Changes'}
+>>>>>>> 885f6e46fde5ccc3d66d67570c482cdded90d7da
                       </Button>
                       <Button type="button" variant="outline" onClick={() => navigate('/pensioners')}>
                         Cancel

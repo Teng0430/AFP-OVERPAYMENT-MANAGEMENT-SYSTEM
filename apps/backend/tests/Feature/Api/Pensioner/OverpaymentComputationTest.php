@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Pensioner;
 use App\Models\User;
 use App\Services\OverpaymentCalculationService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -196,6 +197,48 @@ it('includes multi-component fields in pensioner response', function (): void {
             'grand_total_overpayment',
         ],
     ]);
+});
+
+it('overpayment_total matches individual record overpayment_subtotal', function (): void {
+    $pensioner = Pensioner::factory()->create([
+        'monthly_pension' => 30000,
+        'whole_months' => 3,
+        'fractional_days' => 0,
+    ]);
+
+    $expectedSubtotal = $pensioner->computation_of_days + $pensioner->computation_in_months;
+    expect($pensioner->overpayment_total)->toBe($expectedSubtotal);
+});
+
+it('pensioners with same name have independent overpayment_totals', function (): void {
+    $p1 = Pensioner::factory()->create([
+        'name' => 'Juan Dela Cruz',
+        'monthly_pension' => 30000,
+        'whole_months' => 2,
+        'fractional_days' => 0,
+    ]);
+
+    $p2 = Pensioner::factory()->create([
+        'name' => 'Juan Dela Cruz',
+        'monthly_pension' => 50000,
+        'whole_months' => 1,
+        'fractional_days' => 0,
+    ]);
+
+    expect($p1->overpayment_total)->toBe($p1->overpayment_subtotal);
+    expect($p2->overpayment_total)->toBe($p2->overpayment_subtotal);
+    expect($p1->overpayment_total)->not->toBe($p2->overpayment_total);
+});
+
+it('balance equals overpayment_total minus amount_collected', function (): void {
+    $pensioner = Pensioner::factory()->create([
+        'monthly_pension' => 30000,
+        'whole_months' => 2,
+        'fractional_days' => 0,
+        'amount_collected' => 10000,
+    ]);
+
+    expect($pensioner->balance)->toBe($pensioner->overpayment_total - $pensioner->amount_collected);
 });
 
 it('rejects creation when deductions exceed monthly pension', function (): void {
