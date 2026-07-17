@@ -12,6 +12,7 @@ class UploadBatch extends Model
         'file_name',
         'file_type',
         'file_size',
+        'file_path',
         'total_rows',
         'success_count',
         'error_count',

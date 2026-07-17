@@ -10,7 +10,6 @@ use App\Models\Pensioner;
 use App\Services\OverpaymentCalculationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class PensionerController extends Controller
 {
@@ -25,7 +24,7 @@ class PensionerController extends Controller
         'status', 'last_payment', 'created_at', 'updated_at',
     ];
 
-    public function index(Request $request): AnonymousResourceCollection|JsonResponse
+    public function index(Request $request): JsonResponse
     {
         $query = Pensioner::query();
 
@@ -89,9 +88,20 @@ class PensionerController extends Controller
 
         $query->orderBy($sortBy, $sortDir);
 
-        $pensioners = $query->paginate(50);
+        $perPage = min((int) $request->input('per_page', 50), 100);
+        $pensioners = $query->paginate($perPage);
 
-        return PensionerResource::collection($pensioners);
+        return response()->success([
+            'pensioners' => PensionerResource::collection($pensioners),
+            'meta' => [
+                'current_page' => $pensioners->currentPage(),
+                'last_page' => $pensioners->lastPage(),
+                'per_page' => $pensioners->perPage(),
+                'total' => $pensioners->total(),
+                'from' => $pensioners->firstItem(),
+                'to' => $pensioners->lastItem(),
+            ],
+        ]);
     }
 
     public function show(int $id): JsonResponse
@@ -194,6 +204,11 @@ class PensionerController extends Controller
         if ($dateOfDeath !== null && $lastPayment !== null && $monthlyPension > 0) {
             $data['whole_months'] = OverpaymentCalculationService::wholeMonths($dateOfDeath, $lastPayment);
             $data['fractional_days'] = OverpaymentCalculationService::fractionalDays($dateOfDeath, $lastPayment);
+            $data['overpayment_amount'] = OverpaymentCalculationService::overpaymentAmount(
+                $monthlyPension,
+                $dateOfDeath,
+                $lastPayment,
+            );
         }
 
         if (isset($data['agency_deduction']) && ! isset($data['agency_deductions'])) {

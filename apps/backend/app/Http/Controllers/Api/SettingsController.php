@@ -12,16 +12,11 @@ class SettingsController extends Controller
 {
     public function index(): JsonResponse
     {
-        $settings = Setting::all()->groupBy('group');
+        $settings = Setting::all();
 
-        $grouped = $settings->map(function ($items, $group) {
-            return [
-                'group' => $group,
-                'settings' => SettingResource::collection($items),
-            ];
-        })->values();
-
-        return response()->success($grouped);
+        return response()->success([
+            'settings' => SettingResource::collection($settings),
+        ]);
     }
 
     public function update(Request $request): JsonResponse
@@ -46,7 +41,6 @@ class SettingsController extends Controller
         $settings = Setting::where('group', $group)->get();
 
         return response()->success([
-            'group' => $group,
             'settings' => SettingResource::collection($settings),
         ]);
     }

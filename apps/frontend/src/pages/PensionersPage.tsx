@@ -21,6 +21,7 @@ import { list, remove, bulkDelete, bulkUpdate } from '@/services/pensioners';
 import type { Pensioner } from '@/types';
 import { RANK_OPTIONS, STATUS_OPTIONS, AGENCY_OPTIONS, CAUSE_OF_STOPPAGE_OPTIONS } from '@/types';
 import type { PensionerFilters } from '@/services/pensioners';
+import { formatDateDDMMMYYYY } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -173,7 +174,21 @@ function PensionersPage() {
       { accessorKey: 'name', header: 'Name' },
       { accessorKey: 'serial_number', header: 'Serial #' },
       { accessorKey: 'agency_name', header: 'Agency' },
-      { accessorKey: 'last_payment', header: 'Last Payment' },
+      {
+        accessorKey: 'date_of_death',
+        header: 'Date of Death',
+        cell: ({ row }) => formatDateDDMMMYYYY(row.original.date_of_death),
+      },
+      {
+        accessorKey: 'start_date',
+        header: 'Due Date',
+        cell: ({ row }) => formatDateDDMMMYYYY(row.original.start_date),
+      },
+      {
+        accessorKey: 'last_payment',
+        header: 'Last Payment',
+        cell: ({ row }) => formatDateDDMMMYYYY(row.original.last_payment),
+      },
       { accessorKey: 'agency_deductions', header: 'Agencies',
         cell: ({ row }) => {
           const deps = row.original.agency_deductions;

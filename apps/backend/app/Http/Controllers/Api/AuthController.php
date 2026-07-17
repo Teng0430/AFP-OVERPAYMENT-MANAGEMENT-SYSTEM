@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
+use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -31,16 +32,19 @@ class AuthController extends Controller
 
         if (! $user) {
             Log::warning('Login failed: user not found', ['email' => $email]);
+
             return response()->error('User not found.', 'AUTHENTICATION_ERROR', 401);
         }
 
         if (! Hash::check($request->input('password'), $user->password)) {
             Log::warning('Login failed: incorrect password', ['email' => $email]);
+
             return response()->error('Incorrect password.', 'AUTHENTICATION_ERROR', 401);
         }
 
         if (! $user->is_active) {
             Log::warning('Login failed: account inactive', ['email' => $email]);
+
             return response()->error('Account inactive.', 'AUTHENTICATION_ERROR', 401);
         }
 
@@ -60,7 +64,9 @@ class AuthController extends Controller
 
     public function user(Request $request): JsonResponse
     {
-        return response()->success(['user' => $request->user()]);
+        $user = $request->user()->load('role');
+
+        return response()->success(['user' => new UserResource($user)]);
     }
 
     public function tokens(Request $request): JsonResponse

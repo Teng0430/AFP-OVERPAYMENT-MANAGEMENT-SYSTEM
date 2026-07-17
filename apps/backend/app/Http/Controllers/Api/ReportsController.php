@@ -30,13 +30,18 @@ class ReportsController extends Controller
             ->groupBy('status')
             ->get();
 
+        $dbDriver = DB::connection()->getDriverName();
+        $dateFormat = $dbDriver === 'sqlite'
+            ? "strftime('%Y-%m', created_at)"
+            : "DATE_FORMAT(created_at, '%Y-%m')";
+
         $monthlyTrend = Pensioner::select(
-            DB::raw("DATE_FORMAT(created_at, '%Y-%m') as month"),
+            DB::raw("{$dateFormat} as month"),
             DB::raw('COUNT(*) as count'),
             DB::raw('COALESCE(SUM(monthly_pension * fractional_days + monthly_pension * whole_months), 0) as total_overpayment'),
         )
             ->where('created_at', '>=', Carbon::now()->subMonths(12))
-            ->groupBy(DB::raw("DATE_FORMAT(created_at, '%Y-%m')"))
+            ->groupBy(DB::raw($dateFormat))
             ->orderBy('month')
             ->get();
 

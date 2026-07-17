@@ -51,6 +51,7 @@ class Pensioner extends Model
         'crediting_agency_name',
         'fractional_days',
         'whole_months',
+        'overpayment_amount',
         'amount_collected',
         'date_collected',
         'status',
@@ -66,6 +67,7 @@ class Pensioner extends Model
             'agency_deductions' => 'array',
             'fractional_days' => 'decimal:3',
             'whole_months' => 'integer',
+            'overpayment_amount' => 'decimal:2',
             'amount_collected' => 'decimal:2',
             'date_of_death' => 'date',
             'last_payment' => 'date',
@@ -129,11 +131,15 @@ class Pensioner extends Model
 
     public function getOverpaymentAmountAttribute(): ?float
     {
-        return OverpaymentCalculationService::overpaymentAmount(
-            (float) $this->monthly_pension,
-            $this->date_of_death,
-            $this->last_payment,
-        );
+        if ($this->date_of_death !== null && $this->last_payment !== null) {
+            return OverpaymentCalculationService::overpaymentAmount(
+                (float) $this->monthly_pension,
+                $this->date_of_death,
+                $this->last_payment,
+            );
+        }
+
+        return (float) ($this->attributes['overpayment_amount'] ?? 0);
     }
 
     public function getComputationOfDaysAttribute(): float
@@ -143,11 +149,18 @@ class Pensioner extends Model
                 $this->date_of_death,
                 $this->last_payment,
             );
+            $dailyRate = OverpaymentCalculationService::dailyRate(
+                (float) $this->monthly_pension,
+                $this->date_of_death,
+            );
 
-            return (float) $this->monthly_pension * $fractional;
+            return $fractional * $dailyRate;
         }
 
-        return (float) $this->monthly_pension * (float) $this->fractional_days;
+        return (float) $this->fractional_days * OverpaymentCalculationService::dailyRate(
+            (float) $this->monthly_pension,
+            $this->date_of_death,
+        );
     }
 
     public function getComputationInMonthsAttribute(): float

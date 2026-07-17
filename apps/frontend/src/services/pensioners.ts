@@ -49,8 +49,8 @@ export async function list(filters?: PensionerFilters): Promise<PensionerListRes
 }
 
 export async function get(id: number): Promise<Pensioner> {
-  const data = await apiClient.get(`/pensioners/${id}`) as { pensioner: Pensioner };
-  return data.pensioner;
+  const data = await apiClient.get(`/pensioners/${id}`) as Pensioner;
+  return data;
 }
 
 export async function create(payload: CreatePensionerPayload | Partial<Pensioner>): Promise<Pensioner> {
@@ -63,8 +63,8 @@ export async function create(payload: CreatePensionerPayload | Partial<Pensioner
     }));
   }
 
-  const data = await apiClient.post('/pensioners', normalized) as { pensioner: Pensioner };
-  return data.pensioner;
+  const data = await apiClient.post('/pensioners', normalized) as Pensioner;
+  return data;
 }
 
 export async function update(id: number, payload: Partial<Pensioner>): Promise<Pensioner> {
@@ -77,8 +77,8 @@ export async function update(id: number, payload: Partial<Pensioner>): Promise<P
     }));
   }
 
-  const data = await apiClient.put(`/pensioners/${id}`, normalized) as { pensioner: Pensioner };
-  return data.pensioner;
+  const data = await apiClient.put(`/pensioners/${id}`, normalized) as Pensioner;
+  return data;
 }
 
 export async function remove(id: number): Promise<void> {

@@ -11,6 +11,7 @@ import NotFoundPage from '@/pages/NotFoundPage';
 const DashboardPage = lazy(() => import('@/pages/DashboardPage'));
 const PensionersPage = lazy(() => import('@/pages/PensionersPage'));
 const AddPensionerPage = lazy(() => import('@/pages/AddPensionerPage'));
+const EditPensionerPage = lazy(() => import('@/pages/EditPensionerPage'));
 const UploadPage = lazy(() => import('@/pages/UploadPage'));
 const RecoveryLedgerPage = lazy(() => import('@/pages/RecoveryLedgerPage'));
 const ReportsPage = lazy(() => import('@/pages/ReportsPage'));
@@ -34,6 +35,7 @@ function App() {
               <Route path="dashboard" element={<DashboardPage />} />
               <Route path="pensioners" element={<PensionersPage />} />
               <Route path="pensioners/add" element={<AddPensionerPage />} />
+              <Route path="pensioners/:id/edit" element={<EditPensionerPage />} />
               <Route path="upload" element={<UploadPage />} />
               <Route path="monitoring" element={<ActivityLogsPage />} />
               <Route path="recovery-ledger" element={<RecoveryLedgerPage />} />

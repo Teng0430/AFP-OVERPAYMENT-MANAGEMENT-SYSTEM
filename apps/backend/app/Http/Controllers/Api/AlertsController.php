@@ -7,11 +7,10 @@ use App\Http\Resources\AlertResource;
 use App\Models\Alert;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class AlertsController extends Controller
 {
-    public function index(Request $request): AnonymousResourceCollection
+    public function index(Request $request): JsonResponse
     {
         $query = Alert::query();
 
@@ -22,7 +21,17 @@ class AlertsController extends Controller
         $alerts = $query->orderBy('created_at', 'desc')
             ->paginate(20);
 
-        return AlertResource::collection($alerts);
+        return response()->success([
+            'alerts' => AlertResource::collection($alerts),
+            'meta' => [
+                'current_page' => $alerts->currentPage(),
+                'last_page' => $alerts->lastPage(),
+                'per_page' => $alerts->perPage(),
+                'total' => $alerts->total(),
+                'from' => $alerts->firstItem(),
+                'to' => $alerts->lastItem(),
+            ],
+        ]);
     }
 
     public function markAsRead(int $id): JsonResponse
@@ -33,7 +42,7 @@ class AlertsController extends Controller
             'read_at' => now(),
         ]);
 
-        return response()->success(new AlertResource($alert));
+        return response()->success(['alert' => new AlertResource($alert)]);
     }
 
     public function markAllAsRead(): JsonResponse

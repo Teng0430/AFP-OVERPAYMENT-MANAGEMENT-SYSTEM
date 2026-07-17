@@ -9,8 +9,13 @@ export interface ReportParams {
 }
 
 export async function generate(params: ReportParams): Promise<Blob> {
-  const response = await apiClient.get('/reports/generate', {
-    params,
+  const endpoint = params.format === 'csv' ? '/reports/export-csv' : '/reports/export-pdf';
+  const response = await apiClient.get(endpoint, {
+    params: {
+      type: params.type === 'custom' ? 'all' : params.type,
+      date_from: params.date_from,
+      date_to: params.date_to,
+    },
     responseType: 'blob',
   });
 
@@ -24,5 +29,5 @@ export function getGenerateUrl(params: ReportParams): string {
       query.append(key, String(value));
     }
   });
-  return getDownloadUrl(`/reports/generate?${query.toString()}`);
+  return getDownloadUrl(`/reports/export-pdf?${query.toString()}`);
 }

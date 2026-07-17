@@ -13,9 +13,9 @@ export async function list(filters?: AlertFilters): Promise<{ alerts: Alert[] }>
 }
 
 export async function markRead(id: number): Promise<void> {
-  await apiClient.post(`/alerts/${id}/read`);
+  await apiClient.put(`/alerts/${id}/read`);
 }
 
 export async function markAllRead(): Promise<void> {
-  await apiClient.post('/alerts/read-all');
+  await apiClient.put('/alerts/read-all');
 }

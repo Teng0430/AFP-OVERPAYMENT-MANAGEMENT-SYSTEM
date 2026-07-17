@@ -20,6 +20,15 @@ class UserResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'email' => $this->email,
+            'profile_image_url' => $this->profile_image_url ?? null,
+            'role_id' => $this->role_id,
+            'role' => $this->whenLoaded('role', fn () => $this->role),
+            'department' => $this->department,
+            'is_active' => (bool) $this->is_active,
+            'two_factor_enabled' => (bool) $this->two_factor_enabled,
+            'email_verified_at' => $this->email_verified_at,
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
         ];
     }
 }

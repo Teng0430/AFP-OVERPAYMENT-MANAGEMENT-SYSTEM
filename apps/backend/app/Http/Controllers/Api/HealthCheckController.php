@@ -21,6 +21,7 @@ class HealthCheckController extends Controller
             'app' => 'laravel',
             'version' => '12.x',
             'database' => $databaseStatus,
+            'database_driver' => config('database.default'),
             'timestamp' => now()->toIso8601String(),
         ]);
     }

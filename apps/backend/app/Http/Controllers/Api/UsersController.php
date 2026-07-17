@@ -7,16 +7,25 @@ use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\Hash;
 
 class UsersController extends Controller
 {
-    public function index(): AnonymousResourceCollection
+    public function index(): JsonResponse
     {
         $users = User::with('role')->orderBy('name')->paginate(20);
 
-        return UserResource::collection($users);
+        return response()->success([
+            'users' => UserResource::collection($users),
+            'meta' => [
+                'current_page' => $users->currentPage(),
+                'last_page' => $users->lastPage(),
+                'per_page' => $users->perPage(),
+                'total' => $users->total(),
+                'from' => $users->firstItem(),
+                'to' => $users->lastItem(),
+            ],
+        ]);
     }
 
     public function show(int $id): JsonResponse
@@ -46,7 +55,7 @@ class UsersController extends Controller
 
         $user->load('role');
 
-        return response()->success(new UserResource($user), 201);
+        return response()->success(['user' => new UserResource($user)], 201);
     }
 
     public function update(Request $request, int $id): JsonResponse
@@ -71,7 +80,7 @@ class UsersController extends Controller
         $user->update($data);
         $user->load('role');
 
-        return response()->success(new UserResource($user));
+        return response()->success(['user' => new UserResource($user)]);
     }
 
     public function destroy(Request $request, int $id): JsonResponse

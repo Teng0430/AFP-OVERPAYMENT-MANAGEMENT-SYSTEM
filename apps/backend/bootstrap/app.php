@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Auth\AuthenticationException;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -52,6 +53,23 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->render(function (NotFoundHttpException $e, Request $request): ?JsonResponse {
             if ($request->is('api/*') || $request->expectsJson()) {
                 return response()->error('Resource not found.', 'NOT_FOUND', 404);
+            }
+
+            return null;
+        });
+
+        // Return actionable JSON error for database connection failures on API routes
+        $exceptions->render(function (QueryException $e, Request $request): ?JsonResponse {
+            if ($request->is('api/*') || $request->expectsJson()) {
+                $message = 'A system error occurred. Please try again later.';
+                $code = 'DATABASE_ERROR';
+
+                if (str_contains($e->getMessage(), 'No connection could be made') || str_contains($e->getMessage(), 'Connection refused')) {
+                    $message = 'The database server is not running. Please contact your system administrator.';
+                    $code = 'DB_CONNECTION_REFUSED';
+                }
+
+                return response()->error($message, $code, 503);
             }
 
             return null;

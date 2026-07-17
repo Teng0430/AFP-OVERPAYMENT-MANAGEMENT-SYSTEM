@@ -18,8 +18,14 @@ apiClient.interceptors.request.use((config) => {
 
 apiClient.interceptors.response.use(
   (response: AxiosResponse) => {
+    if (response.config.responseType === 'blob') {
+      return response.data;
+    }
     if (response.data?.success === true) {
       return response.data.data;
+    }
+    if (response.data?.data !== undefined) {
+      return response.data;
     }
     return Promise.reject(new Error(response.data?.error ?? 'Request failed'));
   },
@@ -65,7 +71,8 @@ apiClient.interceptors.response.use(
 export function getDownloadUrl(path: string): string {
   const base = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8000/api';
   const token = localStorage.getItem('auth_token');
-  return `${base}${path}${path.includes('?') ? '&' : '?'}token=${token}`;
+  const separator = path.includes('?') ? '&' : '?';
+  return `${base}${path}${separator}token=${token}`;
 }
 
 export async function uploadFile<T>(

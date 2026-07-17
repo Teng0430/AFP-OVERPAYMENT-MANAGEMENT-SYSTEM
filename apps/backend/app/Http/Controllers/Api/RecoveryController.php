@@ -10,62 +10,113 @@ use App\Models\Pensioner;
 use App\Models\RecoveryInstallment;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\DB;
 
 class RecoveryController extends Controller
 {
-    public function installments(int $pensionerId): AnonymousResourceCollection
+    public function installments(int $pensionerId): JsonResponse
     {
         $installments = RecoveryInstallment::where('pensioner_id', $pensionerId)
             ->with('creator')
             ->orderBy('installment_no')
-            ->paginate(50);
+            ->get();
 
-        return RecoveryInstallmentResource::collection($installments);
+        $pensioner = Pensioner::find($pensionerId);
+        $totalCollecte = (float) $installments->sum('amount_paid');
+        $totalOverpayment = $pensioner ? (float) $pensioner->overpayment_amount : 0;
+        $remainingBalance = max(0, $totalOverpayment - $totalCollecte);
+
+        $summary = [
+            'total_overpayment' => round($totalOverpayment, 2),
+            'total_collected' => round($totalCollecte, 2),
+            'remaining_balance' => round($remainingBalance, 2),
+            'collection_percentage' => $totalOverpayment > 0
+                ? round(($totalCollecte / $totalOverpayment) * 100, 2)
+                : 0.0,
+            'expected_completion' => null,
+        ];
+
+        return response()->success([
+            'installments' => RecoveryInstallmentResource::collection($installments),
+            'summary' => $summary,
+        ]);
     }
 
     public function storeInstallment(Request $request): JsonResponse
     {
         $validated = $request->validate([
             'pensioner_id' => ['required', 'integer', 'exists:pensioners,id'],
-            'installment_no' => ['required', 'integer', 'min:1'],
             'date_paid' => ['required', 'date'],
             'amount_paid' => ['required', 'numeric', 'min:0'],
-            'collector' => ['required', 'string', 'max:255'],
+            'collector' => ['nullable', 'string', 'max:255'],
             'remarks' => ['nullable', 'string', 'max:1000'],
         ]);
 
         $pensioner = Pensioner::findOrFail($validated['pensioner_id']);
         $cumulativePaid = (float) RecoveryInstallment::where('pensioner_id', $pensioner->id)
             ->sum('amount_paid');
+        $nextInstallmentNo = RecoveryInstallment::where('pensioner_id', $pensioner->id)->max('installment_no') + 1;
 
-        $runningBalance = max(0, $pensioner->overpayment_total - $cumulativePaid - (float) $validated['amount_paid']);
+        $runningBalance = max(0, (float) $pensioner->overpayment_amount - $cumulativePaid - (float) $validated['amount_paid']);
 
         $installment = RecoveryInstallment::create([
             'pensioner_id' => $validated['pensioner_id'],
-            'installment_no' => $validated['installment_no'],
+            'installment_no' => $nextInstallmentNo ?: 1,
             'date_paid' => $validated['date_paid'],
             'amount_paid' => $validated['amount_paid'],
             'running_balance' => $runningBalance,
-            'collector' => $validated['collector'],
+            'collector' => $validated['collector'] ?? $request->user()->name,
             'remarks' => $validated['remarks'] ?? null,
             'created_by' => $request->user()->id,
         ]);
 
         $installment->load('creator');
 
-        return response()->success(new RecoveryInstallmentResource($installment), 201);
+        return response()->success(['installment' => new RecoveryInstallmentResource($installment)], 201);
     }
 
-    public function collections(int $pensionerId): AnonymousResourceCollection
+    public function storeInstallmentByPensioner(Request $request, int $pensionerId): JsonResponse
+    {
+        $validated = $request->validate([
+            'date_paid' => ['required', 'date'],
+            'amount_paid' => ['required', 'numeric', 'min:0'],
+            'collector' => ['nullable', 'string', 'max:255'],
+            'remarks' => ['nullable', 'string', 'max:1000'],
+        ]);
+
+        $pensioner = Pensioner::findOrFail($pensionerId);
+        $cumulativePaid = (float) RecoveryInstallment::where('pensioner_id', $pensioner->id)
+            ->sum('amount_paid');
+        $nextInstallmentNo = (RecoveryInstallment::where('pensioner_id', $pensioner->id)->max('installment_no') ?: 0) + 1;
+
+        $runningBalance = max(0, (float) $pensioner->overpayment_amount - $cumulativePaid - (float) $validated['amount_paid']);
+
+        $installment = RecoveryInstallment::create([
+            'pensioner_id' => $pensionerId,
+            'installment_no' => $nextInstallmentNo,
+            'date_paid' => $validated['date_paid'],
+            'amount_paid' => $validated['amount_paid'],
+            'running_balance' => $runningBalance,
+            'collector' => $validated['collector'] ?? $request->user()->name,
+            'remarks' => $validated['remarks'] ?? null,
+            'created_by' => $request->user()->id,
+        ]);
+
+        $installment->load('creator');
+
+        return response()->success(['installment' => new RecoveryInstallmentResource($installment)], 201);
+    }
+
+    public function collections(int $pensionerId): JsonResponse
     {
         $collections = Collection::where('pensioner_id', $pensionerId)
             ->with('creator')
             ->orderBy('collection_date', 'desc')
-            ->paginate(50);
+            ->get();
 
-        return CollectionResource::collection($collections);
+        return response()->success([
+            'collections' => CollectionResource::collection($collections),
+        ]);
     }
 
     public function storeCollection(Request $request): JsonResponse
@@ -93,7 +144,7 @@ class RecoveryController extends Controller
 
         $collection->load('creator');
 
-        return response()->success(new CollectionResource($collection), 201);
+        return response()->success(['collection' => new CollectionResource($collection)], 201);
     }
 
     public function ledger(Request $request): JsonResponse
@@ -109,7 +160,7 @@ class RecoveryController extends Controller
                 'pensioners.amount_collected',
                 'pensioners.status',
                 'pensioners.created_at',
-                DB::raw('(pensioners.monthly_pension * pensioners.fractional_days + pensioners.monthly_pension * pensioners.whole_months) as overpayment'),
+                DB::raw('COALESCE(pensioners.overpayment_amount, 0) as overpayment'),
                 DB::raw('COALESCE(SUM(recovery_installments.amount_paid), 0) as total_installments_paid'),
                 DB::raw('MAX(recovery_installments.date_paid) as last_payment_date'),
             )
@@ -121,8 +172,7 @@ class RecoveryController extends Controller
                 'pensioners.monthly_pension',
                 'pensioners.amount_collected',
                 'pensioners.status',
-                'pensioners.fractional_days',
-                'pensioners.whole_months',
+                'pensioners.overpayment_amount',
                 'pensioners.created_at',
             );
 

@@ -27,7 +27,7 @@ class DashboardController extends Controller
         $recoveredButIncomplete = Pensioner::where('status', 'recovered-but-inc')->count();
 
         // Financial aggregates
-        $totalOverpayment = (float) Pensioner::select(DB::raw('COALESCE(SUM(monthly_pension * fractional_days + monthly_pension * whole_months), 0) as total'))->value('total');
+        $totalOverpayment = (float) Pensioner::select(DB::raw('COALESCE(SUM(overpayment_amount), 0) as total'))->value('total');
         $totalCollected = (float) Pensioner::sum('amount_collected');
         $outstandingBalance = OverpaymentCalculationService::balance($totalOverpayment, $totalCollected);
         $recoveryRate = OverpaymentCalculationService::recoveryRate($totalCollected, $totalOverpayment);
@@ -59,7 +59,7 @@ class DashboardController extends Controller
 
         $previousTotalOverpayment = (float) Pensioner::where('created_at', '>=', $previousPeriodStart)
             ->where('created_at', '<', $previousPeriodEnd)
-            ->select(DB::raw('COALESCE(SUM(monthly_pension * fractional_days + monthly_pension * whole_months), 0) as total'))
+            ->select(DB::raw('COALESCE(SUM(overpayment_amount), 0) as total'))
             ->value('total');
 
         $previousTotalCollected = (float) Pensioner::where('created_at', '>=', $previousPeriodStart)
@@ -103,18 +103,26 @@ class DashboardController extends Controller
 
     public function charts(): JsonResponse
     {
+        $dbDriver = DB::connection()->getDriverName();
+        $dateFormat = $dbDriver === 'sqlite'
+            ? "strftime('%Y-%m', created_at)"
+            : "DATE_FORMAT(created_at, '%Y-%m')";
+        $collectedDateFormat = $dbDriver === 'sqlite'
+            ? "strftime('%Y-%m', COALESCE(date_collected, created_at))"
+            : "DATE_FORMAT(COALESCE(date_collected, created_at), '%Y-%m')";
+
         $monthlyOverpaymentTrend = Pensioner::select(
-            DB::raw("DATE_FORMAT(created_at, '%Y-%m') as month"),
-            DB::raw('COALESCE(SUM(monthly_pension * fractional_days + monthly_pension * whole_months), 0) as amount'),
+            DB::raw("{$dateFormat} as month"),
+            DB::raw('COALESCE(SUM(overpayment_amount), 0) as amount'),
         )
             ->where('created_at', '>=', Carbon::now()->subYear())
-            ->groupBy(DB::raw("DATE_FORMAT(created_at, '%Y-%m')"))
+            ->groupBy(DB::raw($dateFormat))
             ->orderBy('month')
             ->get();
 
         $overpaymentByRank = Pensioner::select(
             'rank',
-            DB::raw('COALESCE(SUM(monthly_pension * fractional_days + monthly_pension * whole_months), 0) as amount'),
+            DB::raw('COALESCE(SUM(overpayment_amount), 0) as amount'),
         )
             ->groupBy('rank')
             ->orderByDesc('amount')
@@ -125,33 +133,40 @@ class DashboardController extends Controller
             ->get();
 
         $collectionProgress = Pensioner::select(
-            DB::raw("DATE_FORMAT(COALESCE(date_collected, created_at), '%Y-%m') as month"),
+            DB::raw("{$collectedDateFormat} as month"),
             DB::raw('COALESCE(SUM(amount_collected), 0) as collected'),
-            DB::raw('COALESCE(SUM(monthly_pension * fractional_days + monthly_pension * whole_months), 0) as target'),
+            DB::raw('COALESCE(SUM(overpayment_amount), 0) as target'),
         )
             ->whereNotNull('amount_collected')
             ->where('amount_collected', '>', 0)
-            ->groupBy(DB::raw("DATE_FORMAT(COALESCE(date_collected, created_at), '%Y-%m')"))
+            ->groupBy(DB::raw($collectedDateFormat))
             ->orderBy('month')
             ->get();
 
         $agencyRecoveries = Pensioner::select(
-            'agency_name',
-            DB::raw('COALESCE(SUM(monthly_pension * fractional_days + monthly_pension * whole_months), 0) as total_overpayment'),
+            DB::raw('agency_name as agency'),
+            DB::raw('COALESCE(SUM(overpayment_amount), 0) as total_overpayment'),
             DB::raw('COALESCE(SUM(amount_collected), 0) as collected'),
         )
             ->groupBy('agency_name')
             ->orderByDesc('total_overpayment')
             ->get();
 
+        $yearCollectedExpr = $dbDriver === 'sqlite'
+            ? "CAST(strftime('%Y', COALESCE(date_collected, created_at)) AS INTEGER)"
+            : 'YEAR(COALESCE(date_collected, created_at))';
+        $monthCollectedExpr = $dbDriver === 'sqlite'
+            ? "CAST(strftime('%m', COALESCE(date_collected, created_at)) AS INTEGER)"
+            : 'MONTH(COALESCE(date_collected, created_at))';
+
         $monthlyRecoveriesHeatmap = Pensioner::select(
-            DB::raw('YEAR(COALESCE(date_collected, created_at)) as year'),
-            DB::raw('MONTH(COALESCE(date_collected, created_at)) as month'),
+            DB::raw("{$yearCollectedExpr} as year"),
+            DB::raw("{$monthCollectedExpr} as month"),
             DB::raw('COALESCE(SUM(amount_collected), 0) as amount'),
         )
             ->whereNotNull('amount_collected')
             ->where('amount_collected', '>', 0)
-            ->groupBy(DB::raw('YEAR(COALESCE(date_collected, created_at))'), DB::raw('MONTH(COALESCE(date_collected, created_at))'))
+            ->groupBy(DB::raw($yearCollectedExpr), DB::raw($monthCollectedExpr))
             ->orderBy('year')
             ->orderBy('month')
             ->get();
@@ -176,7 +191,7 @@ class DashboardController extends Controller
             $start = Carbon::now()->subMonths($i)->startOfMonth();
             $end = Carbon::now()->subMonths($i)->endOfMonth();
             $total = (float) Pensioner::whereBetween('created_at', [$start, $end])
-                ->select(DB::raw('COALESCE(SUM(monthly_pension * fractional_days + monthly_pension * whole_months), 0) as total'))
+                ->select(DB::raw('COALESCE(SUM(overpayment_amount), 0) as total'))
                 ->value('total');
             $months->push(round($total, 2));
         }

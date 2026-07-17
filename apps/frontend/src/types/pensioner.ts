@@ -15,6 +15,7 @@ export interface Pensioner {
   agency_deductions: AgencyDeduction[];
   fractional_days: number;
   whole_months: number;
+  overpayment_amount: number | null;
   start_date: string | null;
   end_date: string | null;
   daily_rate: number | null;
